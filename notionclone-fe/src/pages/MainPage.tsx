@@ -1,9 +1,11 @@
 import { useState } from "react";
 import type { CSSProperties } from "react";
 
+import { KeyboardDoubleArrowRight } from "@mui/icons-material";
+
 import Sidebar from "../ui/sidebar/Sidebar";
 import SearchOverlay from "../ui/search/SearchOverlay";
-import { KeyboardDoubleArrowRight } from "@mui/icons-material";
+import NotionWelcomePage from "../ui/editor/NotionWelcomePage";
 
 const mainPageStyles: Record<string, CSSProperties> = {
   wrap: {
@@ -64,7 +66,9 @@ const MainPage = () => {
       )}
 
       {/* Main Content */}
-      <div style={mainPageStyles.content}></div>
+      <div style={mainPageStyles.content}>
+        <NotionWelcomePage />
+      </div>
 
       {/* SearchOverlay */}
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
