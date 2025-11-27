@@ -1,5 +1,7 @@
 import { BlockNoteEditor } from "@blocknote/core";
 
+import { NO_TITLE_PAGE_TITLE } from "../page";
+
 export const newPageSlashItem = (
   editor: BlockNoteEditor,
   onCreatePage?: () => void
@@ -18,7 +20,7 @@ export const newPageSlashItem = (
         content: [
           {
             type: "text",
-            text: "제목 없는 페이지",
+            text: NO_TITLE_PAGE_TITLE,
             styles: { bold: true },
           },
         ],

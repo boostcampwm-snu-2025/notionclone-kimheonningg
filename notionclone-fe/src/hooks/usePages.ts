@@ -7,6 +7,8 @@ import {
   savePageState,
 } from "../utils/storage/pageStorage";
 
+import { NO_TITLE_PAGE_TITLE } from "../constants/page";
+
 const createId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
@@ -40,7 +42,7 @@ export const usePages = () => {
     const page: Page = {
       id,
       parentId,
-      title: options?.title ?? "제목 없는 페이지",
+      title: options?.title ?? NO_TITLE_PAGE_TITLE,
       icon: options?.icon,
       blocks: options?.initialBlocks ?? [],
       createdAt: new Date().toISOString(),

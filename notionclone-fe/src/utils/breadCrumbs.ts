@@ -1,5 +1,7 @@
 import type { Page, BreadcrumbItem } from "../types/page";
 
+import { NO_TITLE_PAGE_TITLE } from "../constants/page";
+
 export const getBreadcrumbs = (
   startPage: Page | null,
   allPages: Record<string, Page>
@@ -13,7 +15,7 @@ export const getBreadcrumbs = (
     // In [Root, Parent, Current] order- shift at front
     path.unshift({
       id: current.id,
-      title: current.title || "제목 없는 페이지",
+      title: current.title || NO_TITLE_PAGE_TITLE,
     });
 
     // Move to parent page

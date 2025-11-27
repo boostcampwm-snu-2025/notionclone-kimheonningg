@@ -13,6 +13,8 @@ import { SIDEBAR_SECTIONS } from "../../constants/sidebar";
 import SidebarItemRow from "./SidebarItemRow";
 import HoverIconButton from "./HoverIconButton";
 
+import { NO_TITLE_PAGE_TITLE } from "../../constants/page";
+
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
@@ -190,7 +192,7 @@ const Sidebar = ({
                     key={page.id}
                     item={{
                       id: page.id,
-                      label: page.title || "제목 없는 페이지",
+                      label: page.title || NO_TITLE_PAGE_TITLE,
                       icon: page.icon ? (
                         <span>{page.icon}</span>
                       ) : (
