@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { CSSProperties } from "react";
 
 import {
@@ -6,8 +5,10 @@ import {
   EditOutlined,
   HelpOutline,
   Inventory2Outlined,
+  DescriptionOutlined,
 } from "@mui/icons-material";
 
+import type { Page } from "../../types/page";
 import { SIDEBAR_SECTIONS } from "../../constants/sidebar";
 import SidebarItemRow from "./SidebarItemRow";
 import HoverIconButton from "./HoverIconButton";
@@ -17,6 +18,10 @@ interface SidebarProps {
   onToggle: () => void;
   activeId?: string;
   onItemClick?: (id: string) => void;
+  // Props for actual page data
+  pages: Record<string, Page>;
+  rootIds: string[];
+  onCreatePage: () => void;
 }
 
 const sidebarStyles: Record<string, CSSProperties> = {
@@ -77,26 +82,6 @@ const sidebarStyles: Record<string, CSSProperties> = {
     fontSize: 13,
     color: "var(--gray-500)",
   },
-
-  toggleButton: {
-    width: 26,
-    height: 26,
-    borderRadius: 6,
-    border: "1px solid var(--gray-300)",
-    background: "var(--gray-100)",
-    color: "var(--gray-600)",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "background 0.15s ease-out, color 0.15s ease-out",
-  },
-
-  toggleButtonHover: {
-    background: "var(--gray-200)",
-    color: "var(--gray-800)",
-  },
-
   section: { marginTop: 8 },
   sectionLabel: {
     padding: "12px 6px 4px",
@@ -133,6 +118,9 @@ const Sidebar = ({
   onToggle,
   activeId,
   onItemClick,
+  pages,
+  rootIds,
+  onCreatePage,
 }: SidebarProps) => {
   return (
     <aside
@@ -164,6 +152,7 @@ const Sidebar = ({
               <HoverIconButton
                 icon={<EditOutlined fontSize="small" />}
                 label="새 페이지 만들기"
+                onClick={onCreatePage}
               />
             </div>
           </header>
@@ -188,6 +177,48 @@ const Sidebar = ({
               </ul>
             </section>
           ))}
+
+          <section style={sidebarStyles.section}>
+            <div style={sidebarStyles.sectionLabel}>개인 페이지</div>
+            <ul style={sidebarStyles.itemList}>
+              {rootIds.map((id) => {
+                const page = pages[id];
+                if (!page) return null;
+
+                return (
+                  <SidebarItemRow
+                    key={page.id}
+                    item={{
+                      id: page.id,
+                      label: page.title || "제목 없음",
+                      icon: page.icon ? (
+                        <span>{page.icon}</span>
+                      ) : (
+                        <DescriptionOutlined fontSize="small" />
+                      ),
+                    }}
+                    isActive={activeId === page.id}
+                    onClick={
+                      onItemClick ? () => onItemClick(page.id) : undefined
+                    }
+                  />
+                );
+              })}
+
+              {/* When no pages exist */}
+              {rootIds.length === 0 && (
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    fontSize: 13,
+                    color: "var(--gray-500)",
+                  }}
+                >
+                  페이지가 없습니다.
+                </div>
+              )}
+            </ul>
+          </section>
 
           <div style={sidebarStyles.bottom}>
             <div style={sidebarStyles.bottomIcon}>

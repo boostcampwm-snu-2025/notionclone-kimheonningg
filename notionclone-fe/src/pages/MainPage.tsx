@@ -1,19 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 import { KeyboardDoubleArrowRight } from "@mui/icons-material";
 
-import {
-  welcomeId,
-  NOTION_WELCOME_TITLE,
-  NOTION_WELCOME_CONTENT,
-} from "../constants/initialContent/notionWelcome";
-
 import Sidebar from "../ui/sidebar/Sidebar";
 import SearchOverlay from "../ui/search/SearchOverlay";
-
 import PageHeader from "../ui/editor/PageHeader";
 import PageEditor from "../ui/editor/PageEditor";
+
+import { usePages } from "../hooks/usePages";
 
 const mainPageStyles: Record<string, CSSProperties> = {
   wrap: {
@@ -62,12 +57,20 @@ const mainPageStyles: Record<string, CSSProperties> = {
 
 const MainPage = () => {
   const [collapsed, setCollapsed] = useState(false);
-  // Sidebar active id
-  const [activeId, setActiveId] = useState<string | undefined>(welcomeId);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  const {
+    pages,
+    rootIds,
+    activePage,
+    activePageId,
+    setActivePage,
+    createPage,
+    updatePageBlocks,
+  } = usePages();
+
   const handleSidebarItemClick = (id: string) => {
-    setActiveId(id);
+    setActivePage(id);
 
     if (id === "search") {
       setSearchOpen(true);
@@ -75,26 +78,25 @@ const MainPage = () => {
   };
 
   const renderMainContent = (): ReactNode => {
-    if (activeId === "welcome") {
+    if (activePage) {
+      // Reset initial data only when ID changes
+      const initialPageData = useMemo(() => {
+        return activePage;
+      }, [activePage.id]);
+
       return (
         <>
-          <PageHeader title={NOTION_WELCOME_TITLE} icon="👋" />
+          <PageHeader title={activePage.title} icon={activePage.icon || "📄"} />
           <PageEditor
-            page={{
-              id: welcomeId,
-              parentId: null,
-              title: NOTION_WELCOME_TITLE,
-              blocks: NOTION_WELCOME_CONTENT,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            }}
+            // Reset editor component whenever page ID changes
+            key={activePage.id}
+            // Prevent re-rendering using useMemo
+            page={initialPageData}
             onChangeBlocks={(blocks) => {
-              console.log("updated blocks", blocks);
+              updatePageBlocks(activePage.id, blocks);
             }}
             onCreateChildPage={() => {
-              const newId = crypto.randomUUID();
-              console.log("child page created:", newId);
-              return newId;
+              return createPage(activePage.id);
             }}
           />
         </>
@@ -110,8 +112,11 @@ const MainPage = () => {
       <Sidebar
         collapsed={collapsed}
         onToggle={() => setCollapsed(!collapsed)}
-        activeId={activeId}
+        activeId={activePageId ?? undefined}
         onItemClick={handleSidebarItemClick}
+        pages={pages}
+        rootIds={rootIds}
+        onCreatePage={() => createPage(null)}
       />
       {collapsed && (
         <button
