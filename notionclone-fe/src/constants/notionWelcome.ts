@@ -1,17 +1,8 @@
 import type { PartialBlock } from "@blocknote/core";
 
+export const welcomeId = "welcome";
+
 export const NOTION_WELCOME_CONTENT: PartialBlock[] = [
-  {
-    type: "heading",
-    props: { level: 2 },
-    content: [
-      {
-        type: "text",
-        text: "Notion에 오신 것을 환영합니다!",
-        styles: { bold: true },
-      },
-    ],
-  },
   {
     type: "paragraph",
     content: [
