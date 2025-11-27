@@ -15,3 +15,8 @@ export interface PageState {
   rootIds: string[]; // "parentId === null" pages
   activeId: string | null;
 }
+
+export interface BreadcrumbItem {
+  id: string;
+  title: string;
+}
