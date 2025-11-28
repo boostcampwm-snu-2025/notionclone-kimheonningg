@@ -37,15 +37,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
   {
     id: "personal",
     label: "개인 페이지",
-    items: [
-      { id: "welcome", label: "환영합니다", icon: <Person fontSize="small" /> },
-      {
-        id: "weekly",
-        label: "주간 할 일",
-        icon: <ChecklistRtl fontSize="small" />,
-      },
-      { id: "budget", label: "월별 가계부", icon: <Paid fontSize="small" /> },
-    ],
+    items: [], // Dynamically render items
   },
   {
     id: "shared",

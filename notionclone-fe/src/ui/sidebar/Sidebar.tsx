@@ -178,6 +178,7 @@ const Sidebar = ({
                 )}
 
                 <ul style={sidebarStyles.itemList}>
+                  {/* Static item rendering */}
                   {section.items.map((item) => (
                     <SidebarItemRow
                       key={item.id}
@@ -189,8 +190,8 @@ const Sidebar = ({
                     />
                   ))}
 
-                  {/* Adds newly created pages here */}
-                  {section.label === "개인 페이지" &&
+                  {/* Dynamic item rendering */}
+                  {section.id === "personal" &&
                     rootIds.map((id) => {
                       const page = pages[id];
                       if (!page) return null;
