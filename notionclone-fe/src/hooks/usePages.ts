@@ -14,6 +14,23 @@ const createId = () =>
     ? crypto.randomUUID()
     : `page_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
+const getDescendantIds = (
+  pages: Record<string, Page>,
+  parentId: string
+): string[] => {
+  const children = Object.values(pages).filter(
+    (page) => page.parentId === parentId
+  );
+  return children.reduce(
+    (accumulator, child) => [
+      ...accumulator,
+      child.id,
+      ...getDescendantIds(pages, child.id),
+    ],
+    [] as string[]
+  );
+};
+
 export const usePages = () => {
   const [state, setState] = useState<PageState>(() => loadInitialPageState());
 
@@ -59,23 +76,53 @@ export const usePages = () => {
     return id;
   };
 
-  // FIXME: updatePage function is a bit too general
-  const updatePage = (id: string, updates: Partial<Page>) => {
+  const deletePage = (id: string) => {
+    setState((prev) => {
+      const idsToDelete = [id, ...getDescendantIds(prev.pages, id)];
+
+      const nextPages = { ...prev.pages };
+      idsToDelete.forEach((delId) => {
+        delete nextPages[delId];
+      });
+
+      const nextRootIds = prev.rootIds.filter((rootId) => rootId !== id);
+
+      let nextActiveId = prev.activeId;
+      if (nextActiveId && idsToDelete.includes(nextActiveId)) {
+        nextActiveId = nextRootIds.length > 0 ? nextRootIds[0] : null;
+      }
+
+      return {
+        pages: nextPages,
+        rootIds: nextRootIds,
+        activeId: nextActiveId,
+      };
+    });
+  };
+
+  const renamePageTitle = (id: string, title: string) => {
     setState((prev) => {
       const target = prev.pages[id];
       if (!target) return prev;
-
-      const updated: Page = {
-        ...target,
-        ...updates,
-        updatedAt: new Date().toISOString(),
-      };
-
       return {
         ...prev,
         pages: {
           ...prev.pages,
-          [id]: updated,
+          [id]: { ...target, title, updatedAt: new Date().toISOString() },
+        },
+      };
+    });
+  };
+
+  const modifyPageIcon = (id: string, icon: string) => {
+    setState((prev) => {
+      const target = prev.pages[id];
+      if (!target) return prev;
+      return {
+        ...prev,
+        pages: {
+          ...prev.pages,
+          [id]: { ...target, icon, updatedAt: new Date().toISOString() },
         },
       };
     });
@@ -118,7 +165,9 @@ export const usePages = () => {
     activePage,
     setActivePage,
     createPage,
-    updatePage,
+    deletePage,
+    renamePageTitle,
+    modifyPageIcon,
     updatePageBlocks,
     getChildren,
   };
