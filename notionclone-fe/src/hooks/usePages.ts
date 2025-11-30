@@ -59,6 +59,27 @@ export const usePages = () => {
     return id;
   };
 
+  const updatePage = (id: string, updates: Partial<Page>) => {
+    setState((prev) => {
+      const target = prev.pages[id];
+      if (!target) return prev;
+
+      const updated: Page = {
+        ...target,
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      };
+
+      return {
+        ...prev,
+        pages: {
+          ...prev.pages,
+          [id]: updated,
+        },
+      };
+    });
+  };
+
   const updatePageBlocks = (id: string, blocks: PartialBlock[]) => {
     setState((prev) => {
       const target = prev.pages[id];
@@ -110,6 +131,7 @@ export const usePages = () => {
     activePage,
     setActivePage,
     createPage,
+    updatePage,
     updatePageBlocks,
     renamePage,
     getChildren,

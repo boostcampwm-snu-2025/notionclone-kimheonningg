@@ -6,6 +6,8 @@
 
 2주차에 시험(기말고사)이 많아서 1주차에 2주차의 개발 대부분까지 하려고 합니다.. ㅠㅠ
 
+### 1주차 (`main` branch)
+
 - [x] Sidebar 열기 / 닫기 (`Sidebar.tsx`, `SidebarItemRow.tsx`)
 - [x] Sidebar hover 시 나오는 설명은 공통 컴포넌트 (`HoverIconButton.tsx` 사용)
 - [x] 검색창 (기능 없이 UI만 구현- `SearchOverlay.tsx`)
@@ -20,11 +22,14 @@
 - [x] Page hierarchy 정보를 localStorage에 저장 (`pageStorage.ts` util 함수가 관리)
 - [x] Sidebar에서도 -개인 페이지의 `+` 클릭하거나 우측 상단의 연필 이모티콘 클릭 - page 생성 가능 (Sidebar의 root page 목록은 동적으로 렌더링된다)
 - [x] 휴지통 (기능 없이 UI만 구현- `TrashCanOverlay.tsx`)
+
+### 2주차 (`week2` branch)
+
+- [x] `PageHeader` (title, icon 모두) 수정 가능하도록- `emoji-picker-react` 라이브러리 사용
 - [ ] 페이지 삭제하는 로직 `pageStorage.ts`에 구현
 - [ ] Sidebar의 개별 페이지 탭에서 페이지 삭제하거나 해당 페이지의 하위 (Child) 페이지 생성 가능
 - [ ] `/page`로 만든 페이지 아이템 클릭 시 그 페이지로 이동하는 기능
 - [ ] Sidebar의 개별 페이지에서 `>` 클릭 시 page hierarchy 보이도록
-- [ ] `PageHeader` 수정 가능하도록
 
 ## How to run this project
 

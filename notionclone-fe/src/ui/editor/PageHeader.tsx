@@ -1,7 +1,8 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ChangeEvent } from "react";
 
 import type { BreadcrumbItem } from "../../types/page";
 import BreadCrumb from "./BreadCrumb";
+import IconSelector from "./common/IconSelector";
 
 import { NOTION_WELCOME_ICON } from "../../constants/initialContent/notionWelcome";
 
@@ -10,6 +11,8 @@ interface PageHeaderProps {
   icon?: string;
   breadcrumbItems: BreadcrumbItem[];
   onBreadcrumbClick: (id: string) => void;
+  onTitleChange: (newTitle: string) => void;
+  onIconChange: (newIcon: string) => void;
 }
 
 const pageHeaderStyles: Record<string, CSSProperties> = {
@@ -38,12 +41,18 @@ const pageHeaderStyles: Record<string, CSSProperties> = {
     background: "var(--gray-100)",
     cursor: "pointer",
   },
-  title: {
+  titleInput: {
     fontSize: 40,
     fontWeight: 700,
     lineHeight: 1.2,
     color: "var(--gray-900)",
     margin: "0 0 12px",
+    width: "100%",
+    border: "none",
+    background: "none",
+    outline: "none",
+    padding: 0,
+    fontFamily: "inherit",
   },
 };
 
@@ -52,25 +61,29 @@ const PageHeader = ({
   icon = NOTION_WELCOME_ICON,
   breadcrumbItems,
   onBreadcrumbClick,
+  onTitleChange,
+  onIconChange,
 }: PageHeaderProps) => {
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    onTitleChange(e.target.value);
+  };
+
   return (
     <header style={pageHeaderStyles.wrap}>
       <div style={pageHeaderStyles.breadcrumbRow}>
         <BreadCrumb items={breadcrumbItems} onItemClick={onBreadcrumbClick} />
       </div>
 
-      <div style={pageHeaderStyles.emojiRow}>{icon}</div>
+      <div style={pageHeaderStyles.emojiRow}>
+        <IconSelector icon={icon} onIconChange={onIconChange} />
+      </div>
 
-      {/* <div style={pageHeaderStyles.actionRow}>
-        <button type="button" style={pageHeaderStyles.actionButton}>
-          커버 추가
-        </button>
-        <button type="button" style={pageHeaderStyles.actionButton}>
-          댓글 추가
-        </button>
-      </div> */}
-
-      <h1 style={pageHeaderStyles.title}>{title}</h1>
+      <input
+        style={pageHeaderStyles.titleInput}
+        value={title}
+        onChange={handleTitleChange}
+        placeholder="제목 없음"
+      />
     </header>
   );
 };

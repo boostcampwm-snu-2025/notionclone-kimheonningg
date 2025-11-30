@@ -58,6 +58,7 @@ const MainPage = () => {
     setActivePage,
     createPage,
     updatePageBlocks,
+    updatePage,
   } = usePages();
 
   const handleSidebarItemClick = (id: string) => {
@@ -92,6 +93,8 @@ const MainPage = () => {
             icon={activePage.icon || "📄"}
             breadcrumbItems={breadcrumbItems}
             onBreadcrumbClick={(id) => setActivePage(id)}
+            onTitleChange={(title) => updatePage(activePage.id, { title })}
+            onIconChange={(icon) => updatePage(activePage.id, { icon })}
           />
           <PageEditor
             // Reset editor component whenever page ID changes
