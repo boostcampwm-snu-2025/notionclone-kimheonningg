@@ -4,6 +4,7 @@ import type { BreadcrumbItem } from "../../types/page";
 import BreadCrumb from "./BreadCrumb";
 import IconSelector from "./common/IconSelector";
 
+import { NO_TITLE_PAGE_TITLE } from "../../constants/page";
 import { NOTION_WELCOME_ICON } from "../../constants/initialContent/notionWelcome";
 
 interface PageHeaderProps {
@@ -82,7 +83,7 @@ const PageHeader = ({
         style={pageHeaderStyles.titleInput}
         value={title}
         onChange={handleTitleChange}
-        placeholder="제목 없음"
+        placeholder={NO_TITLE_PAGE_TITLE}
       />
     </header>
   );
