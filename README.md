@@ -27,6 +27,7 @@
 
 - [x] `PageHeader` (title, icon 모두) 수정 가능하도록- `emoji-picker-react` 라이브러리 사용
 - [x] 페이지 삭제하는 로직 `usePages.ts`에 구현
+- [x] Sidebar에서 개별 페이지의 `...` 클릭시 `PageMenuOverlay` UI 나오도록
 - [ ] Sidebar의 개별 페이지 탭에서 페이지 삭제하거나 해당 페이지의 하위 (Child) 페이지 생성 가능
 - [ ] Page 삭제 시 휴지통으로 그 페이지 이동하도록
 - [ ] `/page`로 만든 페이지 아이템 클릭 시 그 페이지로 이동하는 기능
