@@ -205,8 +205,6 @@ const PageMenuOverlay = ({
           onClick={onClose}
         />
 
-        <div style={pageMenuOverlayStyles.divider} />
-
         {/* Footer */}
         <div style={pageMenuOverlayStyles.footer}>
           <div>김희원 최종 편집</div>
