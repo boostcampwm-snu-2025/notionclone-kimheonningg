@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
+
+import { dateStr } from "../../utils/date";
+import MenuItem from "./MenuItem";
 
 import {
   StarBorder,
@@ -49,30 +52,6 @@ const pageMenuOverlayStyles: Record<string, CSSProperties> = {
     padding: "0 12px 6px 12px",
     marginTop: "2px",
   },
-  menuItem: {
-    display: "flex",
-    alignItems: "center",
-    padding: "6px 12px",
-    fontSize: "14px",
-    cursor: "pointer",
-    transition: "background-color 0.1s",
-    gap: "10px",
-    userSelect: "none",
-  },
-  menuItemHover: {
-    backgroundColor: "var(--gray-100)",
-  },
-  iconWrapper: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "var(--gray-700)",
-    minWidth: "20px",
-  },
-  label: {
-    flex: 1,
-    whiteSpace: "nowrap",
-  },
   divider: {
     height: "1px",
     backgroundColor: "var(--gray-200)",
@@ -86,39 +65,6 @@ const pageMenuOverlayStyles: Record<string, CSSProperties> = {
     color: "var(--gray-500)",
     lineHeight: "1.4",
   },
-};
-
-const MenuItem = ({
-  icon,
-  label,
-  onClick,
-  color,
-}: {
-  icon: ReactNode;
-  label: string;
-  onClick?: () => void;
-  color?: string;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      style={{
-        ...pageMenuOverlayStyles.menuItem,
-        ...(isHovered ? pageMenuOverlayStyles.menuItemHover : {}),
-        color: color || "inherit",
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (onClick) onClick();
-      }}
-    >
-      <div style={pageMenuOverlayStyles.iconWrapper}>{icon}</div>
-      <div style={pageMenuOverlayStyles.label}>{label}</div>
-    </div>
-  );
 };
 
 const PageMenuOverlay = ({
@@ -177,17 +123,6 @@ const PageMenuOverlay = ({
   }, [anchorEl, onClose]);
 
   if (!anchorEl) return null;
-
-  // date formatting
-  const dateStr = updatedAt
-    ? new Date(updatedAt).toLocaleString("ko-KR", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "";
 
   return (
     <div style={pageMenuOverlayStyles.overlay}>
@@ -275,7 +210,7 @@ const PageMenuOverlay = ({
         {/* Footer */}
         <div style={pageMenuOverlayStyles.footer}>
           <div>김희원 최종 편집</div>
-          {dateStr && <div>{dateStr}</div>}
+          {dateStr && <div>{dateStr(updatedAt as string)}</div>}
         </div>
       </div>
     </div>
