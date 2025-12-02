@@ -29,6 +29,7 @@ interface SidebarProps {
   pages: Record<string, Page>;
   rootIds: string[];
   onCreatePage: () => void;
+  onDeletePage: (id: string) => void;
 }
 
 const sidebarStyles: Record<string, CSSProperties> = {
@@ -144,6 +145,7 @@ const Sidebar = ({
   pages,
   rootIds,
   onCreatePage,
+  onDeletePage,
 }: SidebarProps) => {
   return (
     <aside
@@ -242,7 +244,7 @@ const Sidebar = ({
                           }
                           // TODO
                           onAddChildPage={() => {}}
-                          onOpenDeleteMenu={() => {}}
+                          onDeletePage={() => onDeletePage(page.id)}
                         />
                       );
                     })}
