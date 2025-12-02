@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   DeleteOutline,
   HelpOutline,
@@ -8,6 +8,10 @@ import {
   DescriptionOutlined,
   BusinessOutlined,
 } from "@mui/icons-material";
+
+import type { Page } from "../../types/page";
+import { loadTempDeletedPageState } from "../../utils/storage/pageStorage";
+import { NO_TITLE_PAGE_TITLE } from "../../constants/page";
 
 interface TrashCanOverlayProps {
   open: boolean;
@@ -79,6 +83,45 @@ const trashCanOverlayStyles: Record<string, CSSProperties> = {
     flex: 1,
     display: "flex",
     flexDirection: "column",
+    alignItems: "stretch",
+    justifyContent: "flex-start",
+    padding: "8px 0 8px 0",
+  },
+  listWrap: {
+    flex: 1,
+    overflowY: "auto",
+    padding: "8px 16px 16px",
+  },
+  listItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "4px 4px",
+    borderRadius: 4,
+    cursor: "pointer",
+  },
+  listItemIcon: {
+    width: 18,
+    height: 18,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "var(--gray-600)",
+    flexShrink: 0,
+  },
+  listItemTextMain: {
+    fontSize: 14,
+    color: "var(--gray-900)",
+  },
+  listItemTextSub: {
+    fontSize: 11,
+    color: "var(--gray-500)",
+    marginTop: 2,
+  },
+  emptyStateWrap: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     color: "var(--gray-800)",
@@ -107,6 +150,8 @@ const trashCanOverlayStyles: Record<string, CSSProperties> = {
 
 const TrashCanOverlay = ({ open, onClose }: TrashCanOverlayProps) => {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [deletedPages, setDeletedPages] = useState<Record<string, Page>>({});
+  const [searchText, setSearchText] = useState<string>("");
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -117,6 +162,56 @@ const TrashCanOverlay = ({ open, onClose }: TrashCanOverlayProps) => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, onClose]);
+
+  // Load temp deleted pages from localStorage
+  useEffect(() => {
+    if (!open) return;
+
+    try {
+      const { tempDeletedPages } = loadTempDeletedPageState();
+      setDeletedPages(tempDeletedPages ?? {});
+    } catch (error) {
+      console.warn("Failed to load deleted pages", error);
+      setDeletedPages({});
+    }
+  }, [open]);
+
+  // Build parent path of temp deleted pages
+  const buildParentPath = (page: Page): string | null => {
+    const chain: string[] = [];
+    let parentId = page.parentId;
+    let guard = 0;
+
+    while (parentId) {
+      const parent = deletedPages[parentId];
+      if (!parent) break;
+
+      chain.unshift(parent.title || NO_TITLE_PAGE_TITLE);
+      parentId = parent.parentId;
+      guard += 1;
+      if (guard > 20) break;
+    }
+
+    return chain.length > 0 ? chain.join(" / ") : null;
+  };
+
+  const filteredPages = useMemo(() => {
+    const list = Object.values(deletedPages);
+
+    list.sort((a, b) => {
+      const aTime = a.updatedAt || a.createdAt || "";
+      const bTime = b.updatedAt || b.createdAt || "";
+      // Recently deleted page goes above
+      return bTime.localeCompare(aTime);
+    });
+
+    if (!searchText.trim()) return list;
+
+    const keyword = searchText.trim().toLowerCase();
+    return list.filter((page) =>
+      (page.title || NO_TITLE_PAGE_TITLE).toLowerCase().includes(keyword)
+    );
+  }, [deletedPages, searchText]);
 
   if (!open) return null;
 
@@ -135,6 +230,8 @@ const TrashCanOverlay = ({ open, onClose }: TrashCanOverlayProps) => {
             placeholder="휴지통에서 페이지 검색"
             style={trashCanOverlayStyles.searchInput}
             autoFocus
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
 
@@ -164,8 +261,38 @@ const TrashCanOverlay = ({ open, onClose }: TrashCanOverlayProps) => {
         </div>
 
         <div style={trashCanOverlayStyles.content}>
-          <DeleteOutline style={trashCanOverlayStyles.emptyIcon} />
-          <div style={trashCanOverlayStyles.emptyText}>표시할 결과 없음</div>
+          {filteredPages.length === 0 ? (
+            <div style={trashCanOverlayStyles.emptyStateWrap}>
+              <DeleteOutline style={trashCanOverlayStyles.emptyIcon} />
+              <div style={trashCanOverlayStyles.emptyText}>
+                표시할 결과 없음
+              </div>
+            </div>
+          ) : (
+            <div style={trashCanOverlayStyles.listWrap}>
+              {filteredPages.map((page) => {
+                const parentPath = buildParentPath(page);
+
+                return (
+                  <div key={page.id} style={trashCanOverlayStyles.listItem}>
+                    <div style={trashCanOverlayStyles.listItemIcon}>
+                      <DescriptionOutlined style={{ fontSize: 18 }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={trashCanOverlayStyles.listItemTextMain}>
+                        {page.title || NO_TITLE_PAGE_TITLE}
+                      </div>
+                      {parentPath && (
+                        <div style={trashCanOverlayStyles.listItemTextSub}>
+                          {parentPath}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div style={trashCanOverlayStyles.footer}>
