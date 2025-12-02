@@ -5,6 +5,8 @@ import type { Page, PageState } from "../types/page";
 import {
   loadInitialPageState,
   savePageState,
+  loadTempDeletedPageState,
+  saveTempDeletedPageState,
 } from "../utils/storage/pageStorage";
 
 import { NO_TITLE_PAGE_TITLE } from "../constants/page";
@@ -76,6 +78,7 @@ export const usePages = () => {
     return id;
   };
 
+  // Actual deletion
   const deletePage = (id: string) => {
     setState((prev) => {
       const idsToDelete = [id, ...getDescendantIds(prev.pages, id)];
@@ -86,6 +89,53 @@ export const usePages = () => {
       });
 
       const nextRootIds = prev.rootIds.filter((rootId) => rootId !== id);
+
+      let nextActiveId = prev.activeId;
+      if (nextActiveId && idsToDelete.includes(nextActiveId)) {
+        nextActiveId = nextRootIds.length > 0 ? nextRootIds[0] : null;
+      }
+
+      return {
+        pages: nextPages,
+        rootIds: nextRootIds,
+        activeId: nextActiveId,
+      };
+    });
+  };
+
+  // Temporary delete to trash can
+  const tempDeletePage = (id: string) => {
+    setState((prev) => {
+      const idsToDelete = [id, ...getDescendantIds(prev.pages, id)];
+
+      const pagesToMove: Record<string, Page> = {};
+      idsToDelete.forEach((delId) => {
+        const page = prev.pages[delId];
+        if (page) {
+          pagesToMove[delId] = page;
+        }
+      });
+
+      try {
+        const deletedState = loadTempDeletedPageState();
+        const nextDeletedPages = {
+          ...deletedState.tempDeletedPages,
+          ...pagesToMove,
+        };
+        saveTempDeletedPageState({ tempDeletedPages: nextDeletedPages });
+      } catch (error) {
+        console.warn("Failed to move pages into deleted storage", error);
+      }
+
+      // Remove from original pages
+      const nextPages = { ...prev.pages };
+      idsToDelete.forEach((delId) => {
+        delete nextPages[delId];
+      });
+
+      const nextRootIds = prev.rootIds.filter(
+        (rootId) => !idsToDelete.includes(rootId)
+      );
 
       let nextActiveId = prev.activeId;
       if (nextActiveId && idsToDelete.includes(nextActiveId)) {
@@ -166,6 +216,7 @@ export const usePages = () => {
     setActivePage,
     createPage,
     deletePage,
+    tempDeletePage,
     renamePageTitle,
     modifyPageIcon,
     updatePageBlocks,

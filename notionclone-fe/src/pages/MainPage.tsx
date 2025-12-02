@@ -58,6 +58,7 @@ const MainPage = () => {
     setActivePage,
     createPage,
     deletePage,
+    tempDeletePage,
     updatePageBlocks,
     renamePageTitle,
     modifyPageIcon,
@@ -128,7 +129,7 @@ const MainPage = () => {
         pages={pages}
         rootIds={rootIds}
         onCreatePage={() => createPage(null)}
-        onDeletePage={deletePage}
+        onDeletePage={tempDeletePage}
       />
       {collapsed && (
         <button
