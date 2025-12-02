@@ -7,6 +7,7 @@ import {
   PersonOutline,
   DescriptionOutlined,
   BusinessOutlined,
+  UndoOutlined,
 } from "@mui/icons-material";
 
 import type { Page } from "../../types/page";
@@ -16,6 +17,8 @@ import { NO_TITLE_PAGE_TITLE } from "../../constants/page";
 interface TrashCanOverlayProps {
   open: boolean;
   onClose: () => void;
+  onRestorePage: (id: string) => void;
+  onPermanentDeletePage: (id: string) => void;
 }
 
 const trashCanOverlayStyles: Record<string, CSSProperties> = {
@@ -75,10 +78,6 @@ const trashCanOverlayStyles: Record<string, CSSProperties> = {
     color: "var(--gray-600)",
     cursor: "pointer",
   },
-  activeFilter: {
-    background: "var(--blue-100)",
-    color: "var(--blue-600)",
-  },
   content: {
     flex: 1,
     display: "flex",
@@ -98,7 +97,21 @@ const trashCanOverlayStyles: Record<string, CSSProperties> = {
     gap: 8,
     padding: "4px 4px",
     borderRadius: 4,
+  },
+  listItemControls: {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+    marginLeft: "auto",
+    flexShrink: 0,
+  },
+  controlButton: {
+    border: "none",
+    background: "transparent",
     cursor: "pointer",
+    fontSize: 16,
+    padding: 0,
+    color: "var(--gray-500)",
   },
   listItemIcon: {
     width: 18,
@@ -148,7 +161,29 @@ const trashCanOverlayStyles: Record<string, CSSProperties> = {
   },
 };
 
-const TrashCanOverlay = ({ open, onClose }: TrashCanOverlayProps) => {
+const getDescendantIdsLocal = (
+  pages: Record<string, Page>,
+  parentId: string
+): string[] => {
+  const children = Object.values(pages).filter(
+    (page) => page.parentId === parentId
+  );
+  return children.reduce(
+    (accumulator, child) => [
+      ...accumulator,
+      child.id,
+      ...getDescendantIdsLocal(pages, child.id),
+    ],
+    [] as string[]
+  );
+};
+
+const TrashCanOverlay = ({
+  open,
+  onClose,
+  onRestorePage,
+  onPermanentDeletePage,
+}: TrashCanOverlayProps) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [deletedPages, setDeletedPages] = useState<Record<string, Page>>({});
   const [searchText, setSearchText] = useState<string>("");
@@ -201,7 +236,6 @@ const TrashCanOverlay = ({ open, onClose }: TrashCanOverlayProps) => {
     list.sort((a, b) => {
       const aTime = a.updatedAt || a.createdAt || "";
       const bTime = b.updatedAt || b.createdAt || "";
-      // Recently deleted page goes above
       return bTime.localeCompare(aTime);
     });
 
@@ -273,6 +307,36 @@ const TrashCanOverlay = ({ open, onClose }: TrashCanOverlayProps) => {
               {filteredPages.map((page) => {
                 const parentPath = buildParentPath(page);
 
+                const handleRestore = () => {
+                  const ids = [
+                    page.id,
+                    ...getDescendantIdsLocal(deletedPages, page.id),
+                  ];
+                  onRestorePage(page.id);
+                  setDeletedPages((prev) => {
+                    const next = { ...prev };
+                    ids.forEach((id) => {
+                      delete next[id];
+                    });
+                    return next;
+                  });
+                };
+
+                const handlePermanentDelete = () => {
+                  const ids = [
+                    page.id,
+                    ...getDescendantIdsLocal(deletedPages, page.id),
+                  ];
+                  onPermanentDeletePage(page.id);
+                  setDeletedPages((prev) => {
+                    const next = { ...prev };
+                    ids.forEach((id) => {
+                      delete next[id];
+                    });
+                    return next;
+                  });
+                };
+
                 return (
                   <div key={page.id} style={trashCanOverlayStyles.listItem}>
                     <div style={trashCanOverlayStyles.listItemIcon}>
@@ -287,6 +351,25 @@ const TrashCanOverlay = ({ open, onClose }: TrashCanOverlayProps) => {
                           {parentPath}
                         </div>
                       )}
+                    </div>
+
+                    <div style={trashCanOverlayStyles.listItemControls}>
+                      <button
+                        type="button"
+                        title="복구"
+                        style={trashCanOverlayStyles.controlButton}
+                        onClick={handleRestore}
+                      >
+                        <UndoOutlined style={{ fontSize: 18 }} />
+                      </button>
+                      <button
+                        type="button"
+                        title="영구 삭제"
+                        style={trashCanOverlayStyles.controlButton}
+                        onClick={handlePermanentDelete}
+                      >
+                        <DeleteOutline style={{ fontSize: 18 }} />
+                      </button>
                     </div>
                   </div>
                 );

@@ -57,8 +57,9 @@ const MainPage = () => {
     activePageId,
     setActivePage,
     createPage,
-    deletePage,
+    permanentlyDeletePage,
     tempDeletePage,
+    restoreTempDeletedPage,
     updatePageBlocks,
     renamePageTitle,
     modifyPageIcon,
@@ -148,7 +149,12 @@ const MainPage = () => {
 
       {/* Overlays */}
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <TrashCanOverlay open={trashOpen} onClose={() => setTrashOpen(false)} />
+      <TrashCanOverlay
+        open={trashOpen}
+        onClose={() => setTrashOpen(false)}
+        onRestorePage={restoreTempDeletedPage}
+        onPermanentDeletePage={permanentlyDeletePage}
+      />
     </div>
   );
 };
