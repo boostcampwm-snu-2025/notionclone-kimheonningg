@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { useState } from "react";
 
 import {
   KeyboardDoubleArrowLeft,
@@ -147,6 +148,48 @@ const Sidebar = ({
   onCreatePage,
   onDeletePage,
 }: SidebarProps) => {
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const getChildren = (parentId: string | null) =>
+    Object.values(pages).filter((page) => page.parentId === parentId);
+
+  const renderPageNode = (page: Page) => {
+    const children = getChildren(page.id);
+    const hasChildren = children.length > 0;
+    const isExpanded = !!expandedIds[page.id];
+
+    return (
+      <div key={page.id}>
+        <SidebarItemRow
+          item={{
+            id: page.id,
+            label: page.title || NO_TITLE_PAGE_TITLE,
+            icon: page.icon ? (
+              <span>{page.icon}</span>
+            ) : (
+              <DescriptionOutlined fontSize="small" />
+            ),
+          }}
+          isActive={activeId === page.id}
+          onClick={onItemClick ? () => onItemClick(page.id) : undefined}
+          hasChildren={hasChildren}
+          isExpanded={isExpanded}
+          onToggleExpand={() => toggleExpand(page.id)}
+          onAddChildPage={() => {}}
+          onDeletePage={() => onDeletePage(page.id)}
+        />
+        {hasChildren && isExpanded && (
+          <div style={{ marginLeft: 14 }}>
+            {children.map((child) => renderPageNode(child))}
+          </div>
+        )}
+      </div>
+    );
+  };
   return (
     <aside
       style={{
@@ -226,27 +269,7 @@ const Sidebar = ({
                       const page = pages[id];
                       if (!page) return null;
 
-                      return (
-                        <SidebarItemRow
-                          key={page.id}
-                          item={{
-                            id: page.id,
-                            label: page.title || NO_TITLE_PAGE_TITLE,
-                            icon: page.icon ? (
-                              <span>{page.icon}</span>
-                            ) : (
-                              <DescriptionOutlined fontSize="small" />
-                            ),
-                          }}
-                          isActive={activeId === page.id}
-                          onClick={
-                            onItemClick ? () => onItemClick(page.id) : undefined
-                          }
-                          // TODO
-                          onAddChildPage={() => {}}
-                          onDeletePage={() => onDeletePage(page.id)}
-                        />
-                      );
+                      return renderPageNode(page);
                     })}
                 </ul>
               </section>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { CSSProperties, MouseEvent } from "react";
-import { MoreHoriz, Add } from "@mui/icons-material";
+import { MoreHoriz, Add, ChevronRight, ExpandMore } from "@mui/icons-material";
 
 import type { SidebarItem } from "../../types/sidebar";
 import HoverIconButton from "./HoverIconButton";
@@ -15,6 +15,9 @@ interface SidebarItemRowProps {
   onDeletePage?: () => void;
   onRenamePage?: () => void;
   updatedAt?: string;
+  hasChildren?: boolean;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 const rowStyles: Record<string, CSSProperties> = {
@@ -78,6 +81,9 @@ const SidebarItemRow = ({
   onDeletePage,
   onRenamePage,
   updatedAt,
+  hasChildren,
+  isExpanded,
+  onToggleExpand,
 }: SidebarItemRowProps) => {
   const [hover, setHover] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
@@ -100,6 +106,8 @@ const SidebarItemRow = ({
   const safeRename =
     onRenamePage || (() => console.log("Rename not implemented"));
 
+  const showChevron = !!hasChildren && (hover || isExpanded);
+
   return (
     <>
       <li
@@ -112,7 +120,27 @@ const SidebarItemRow = ({
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => !isMenuOpen && setHover(false)}
       >
-        {item.icon && <span style={rowStyles.icon}>{item.icon}</span>}
+        {item.icon && (
+          <span
+            style={rowStyles.icon}
+            onClick={(e) => {
+              if (!hasChildren || !onToggleExpand) return;
+              e.stopPropagation();
+              onToggleExpand();
+            }}
+          >
+            {showChevron ? (
+              isExpanded ? (
+                <ExpandMore sx={{ fontSize: 18 }} />
+              ) : (
+                <ChevronRight sx={{ fontSize: 18 }} />
+              )
+            ) : (
+              item.icon
+            )}
+          </span>
+        )}
+
         <span style={rowStyles.label}>{item.label}</span>
 
         {item.badge && !hover && !isMenuOpen && (
