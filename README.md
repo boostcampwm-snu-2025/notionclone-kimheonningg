@@ -32,8 +32,9 @@
 - [x] Sidebar의 개별 페이지 탭 우측 `+` 아이콘에서 해당 페이지의 하위 (Child) 페이지 생성 가능
 - [x] Page 삭제 시 휴지통으로 그 페이지 이동하도록- 임시로 지운 페이지 목록 역시 localStorage로 관리한다
 - [x] 휴지통에서 지워야 localStorage에서 그 페이지 지움
-- [ ] `/page`로 만든 페이지 아이템 클릭 시 그 페이지로 이동하는 기능
 - [x] Sidebar의 개별 페이지에서 `>` 클릭 시 page hierarchy 보이도록
+- [x] AI assistant UI 생성
+- [ ] `/page`로 만든 페이지 아이템 클릭 시 그 페이지로 이동하는 기능
 - [ ] OPENAI API 연결
 - [ ] OPENAI API로 notion 작업할 수 있도록
 - [ ] 검색 기능 추가

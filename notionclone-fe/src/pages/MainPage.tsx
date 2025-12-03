@@ -8,6 +8,7 @@ import SearchOverlay from "../ui/overlay/SearchOverlay";
 import TrashCanOverlay from "../ui/overlay/TrashCanOverlay";
 import PageHeader from "../ui/editor/PageHeader";
 import PageEditor from "../ui/editor/PageEditor";
+import AIAssistantLauncher from "../ui/aiAssistant/AIAssistantLauncher";
 
 import { usePages } from "../hooks/usePages";
 import { getBreadcrumbs } from "../utils/breadCrumbs";
@@ -158,6 +159,9 @@ const MainPage = () => {
         onRestorePage={restoreTempDeletedPage}
         onPermanentDeletePage={permanentlyDeletePage}
       />
+
+      {/* AI Assistant */}
+      <AIAssistantLauncher />
     </div>
   );
 };
