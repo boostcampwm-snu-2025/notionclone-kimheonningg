@@ -129,7 +129,10 @@ const MainPage = () => {
         onItemClick={handleSidebarItemClick}
         pages={pages}
         rootIds={rootIds}
+        // Create root page
         onCreatePage={() => createPage(null)}
+        // Create child page under parent of parentId
+        onCreateChildPage={(parentId) => createPage(parentId)}
         onDeletePage={tempDeletePage}
       />
       {collapsed && (

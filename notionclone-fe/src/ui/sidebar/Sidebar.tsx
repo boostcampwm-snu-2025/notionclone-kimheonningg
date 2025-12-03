@@ -29,7 +29,10 @@ interface SidebarProps {
   // Props for actual page data
   pages: Record<string, Page>;
   rootIds: string[];
+  // Create root page
   onCreatePage: () => void;
+  // Create child page under parent page of parentId
+  onCreateChildPage: (parentId: string) => void;
   onDeletePage: (id: string) => void;
 }
 
@@ -146,6 +149,7 @@ const Sidebar = ({
   pages,
   rootIds,
   onCreatePage,
+  onCreateChildPage,
   onDeletePage,
 }: SidebarProps) => {
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
@@ -161,6 +165,14 @@ const Sidebar = ({
     const children = getChildren(page.id);
     const hasChildren = children.length > 0;
     const isExpanded = !!expandedIds[page.id];
+
+    // Make child page under current page
+    const handleAddChildPage = () => {
+      // Make child
+      onCreateChildPage(page.id);
+      // Expand if currently folded
+      setExpandedIds((prev) => ({ ...prev, [page.id]: true }));
+    };
 
     return (
       <div key={page.id}>
@@ -179,7 +191,7 @@ const Sidebar = ({
           hasChildren={hasChildren}
           isExpanded={isExpanded}
           onToggleExpand={() => toggleExpand(page.id)}
-          onAddChildPage={() => {}}
+          onAddChildPage={handleAddChildPage}
           onDeletePage={() => onDeletePage(page.id)}
         />
         {hasChildren && isExpanded && (
