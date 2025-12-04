@@ -1,7 +1,7 @@
 import type { PageState, TempDeletedPageState } from "../../types/page";
 
 import {
-  welcomeId,
+  NOTION_WELCOME_ID,
   NOTION_WELCOME_ICON,
   NOTION_WELCOME_TITLE,
   NOTION_WELCOME_CONTENT,
@@ -29,8 +29,8 @@ export const loadInitialPageState = (): PageState => {
 
   return {
     pages: {
-      [welcomeId]: {
-        id: welcomeId,
+      [NOTION_WELCOME_ID]: {
+        id: NOTION_WELCOME_ID,
         parentId: null,
         title: NOTION_WELCOME_TITLE,
         icon: NOTION_WELCOME_ICON,
@@ -39,8 +39,8 @@ export const loadInitialPageState = (): PageState => {
         updatedAt: new Date().toISOString(),
       },
     },
-    rootIds: [welcomeId],
-    activeId: welcomeId,
+    rootIds: [NOTION_WELCOME_ID],
+    activeId: NOTION_WELCOME_ID,
   };
 };
 
