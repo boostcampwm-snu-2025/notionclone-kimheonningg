@@ -6,6 +6,7 @@ interface HoverIconButtonProps {
   label: string;
   onClick?: () => void;
   noBorder?: boolean;
+  active?: boolean;
 }
 
 const hoverIconButtonStyles: Record<string, CSSProperties> = {
@@ -65,6 +66,7 @@ const HoverIconButton = ({
   label,
   onClick,
   noBorder = false,
+  active = false,
 }: HoverIconButtonProps) => {
   const [hover, setHover] = useState(false);
 
@@ -79,7 +81,7 @@ const HoverIconButton = ({
         style={{
           ...hoverIconButtonStyles.button,
           ...(noBorder ? hoverIconButtonStyles.buttonNoBorder : {}),
-          ...(hover ? hoverIconButtonStyles.buttonHover : {}),
+          ...(hover || active ? hoverIconButtonStyles.buttonHover : {}),
         }}
         onClick={onClick}
       >
@@ -89,7 +91,7 @@ const HoverIconButton = ({
       <div
         style={{
           ...hoverIconButtonStyles.tooltip,
-          ...(hover ? hoverIconButtonStyles.tooltipVisible : {}),
+          ...(hover && !active ? hoverIconButtonStyles.tooltipVisible : {}),
         }}
       >
         {label}

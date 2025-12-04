@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { useState } from "react";
 
 import {
   KeyboardDoubleArrowLeft,
@@ -28,7 +29,11 @@ interface SidebarProps {
   // Props for actual page data
   pages: Record<string, Page>;
   rootIds: string[];
+  // Create root page
   onCreatePage: () => void;
+  // Create child page under parent page of parentId
+  onCreateChildPage: (parentId: string) => void;
+  onDeletePage: (id: string) => void;
 }
 
 const sidebarStyles: Record<string, CSSProperties> = {
@@ -144,7 +149,59 @@ const Sidebar = ({
   pages,
   rootIds,
   onCreatePage,
+  onCreateChildPage,
+  onDeletePage,
 }: SidebarProps) => {
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const getChildren = (parentId: string | null) =>
+    Object.values(pages).filter((page) => page.parentId === parentId);
+
+  const renderPageNode = (page: Page) => {
+    const children = getChildren(page.id);
+    const hasChildren = children.length > 0;
+    const isExpanded = !!expandedIds[page.id];
+
+    // Make child page under current page
+    const handleAddChildPage = () => {
+      // Make child
+      onCreateChildPage(page.id);
+      // Expand if currently folded
+      setExpandedIds((prev) => ({ ...prev, [page.id]: true }));
+    };
+
+    return (
+      <div key={page.id}>
+        <SidebarItemRow
+          item={{
+            id: page.id,
+            label: page.title || NO_TITLE_PAGE_TITLE,
+            icon: page.icon ? (
+              <span>{page.icon}</span>
+            ) : (
+              <DescriptionOutlined fontSize="small" />
+            ),
+          }}
+          isActive={activeId === page.id}
+          onClick={onItemClick ? () => onItemClick(page.id) : undefined}
+          hasChildren={hasChildren}
+          isExpanded={isExpanded}
+          onToggleExpand={() => toggleExpand(page.id)}
+          onAddChildPage={handleAddChildPage}
+          onDeletePage={() => onDeletePage(page.id)}
+        />
+        {hasChildren && isExpanded && (
+          <div style={{ marginLeft: 14 }}>
+            {children.map((child) => renderPageNode(child))}
+          </div>
+        )}
+      </div>
+    );
+  };
   return (
     <aside
       style={{
@@ -224,27 +281,7 @@ const Sidebar = ({
                       const page = pages[id];
                       if (!page) return null;
 
-                      return (
-                        <SidebarItemRow
-                          key={page.id}
-                          item={{
-                            id: page.id,
-                            label: page.title || NO_TITLE_PAGE_TITLE,
-                            icon: page.icon ? (
-                              <span>{page.icon}</span>
-                            ) : (
-                              <DescriptionOutlined fontSize="small" />
-                            ),
-                          }}
-                          isActive={activeId === page.id}
-                          onClick={
-                            onItemClick ? () => onItemClick(page.id) : undefined
-                          }
-                          // TODO
-                          onAddChildPage={() => {}}
-                          onOpenDeleteMenu={() => {}}
-                        />
-                      );
+                      return renderPageNode(page);
                     })}
                 </ul>
               </section>

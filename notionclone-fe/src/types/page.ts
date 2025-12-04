@@ -16,6 +16,10 @@ export interface PageState {
   activeId: string | null;
 }
 
+export interface TempDeletedPageState {
+  tempDeletedPages: Record<string, Page>;
+}
+
 export interface BreadcrumbItem {
   id: string;
   title: string;

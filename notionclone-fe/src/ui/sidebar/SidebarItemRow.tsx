@@ -1,9 +1,10 @@
 import { useState } from "react";
-import type { CSSProperties } from "react";
-import { MoreHoriz, Add } from "@mui/icons-material";
+import type { CSSProperties, MouseEvent } from "react";
+import { MoreHoriz, Add, ChevronRight, ExpandMore } from "@mui/icons-material";
 
 import type { SidebarItem } from "../../types/sidebar";
 import HoverIconButton from "./HoverIconButton";
+import PageMenuOverlay from "../overlay/PageMenuOverlay";
 
 interface SidebarItemRowProps {
   item: SidebarItem;
@@ -11,7 +12,12 @@ interface SidebarItemRowProps {
   onClick?: () => void;
   // "개인 페이지" tab
   onAddChildPage?: () => void;
-  onOpenDeleteMenu?: () => void;
+  onDeletePage?: () => void;
+  onRenamePage?: () => void;
+  updatedAt?: string;
+  hasChildren?: boolean;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 const rowStyles: Record<string, CSSProperties> = {
@@ -72,66 +78,112 @@ const SidebarItemRow = ({
   isActive,
   onClick,
   onAddChildPage,
-  onOpenDeleteMenu,
+  onDeletePage,
+  onRenamePage,
+  updatedAt,
+  hasChildren,
+  isExpanded,
+  onToggleExpand,
 }: SidebarItemRowProps) => {
   const [hover, setHover] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
 
-  // activate only if onClick exist
   const isClickable = !!onClick;
+  const isMenuOpen = Boolean(menuAnchorEl);
+
+  const handleMoreClick = (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setMenuAnchorEl(e.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setHover(false); // Reset hover state to false as closing the menu
+  };
+
+  const safeDelete =
+    onDeletePage || (() => console.log("Delete not implemented"));
+  const safeRename =
+    onRenamePage || (() => console.log("Rename not implemented"));
+
+  const showChevron = !!hasChildren && (hover || isExpanded);
 
   return (
-    <li
-      style={{
-        ...rowStyles.item,
-        // Hover is only allowed when clickable
-        ...(isClickable && hover ? rowStyles.itemHover : {}),
+    <>
+      <li
+        style={{
+          ...rowStyles.item,
+          ...(isClickable && (hover || isMenuOpen) ? rowStyles.itemHover : {}),
+          ...(isActive ? rowStyles.itemActive : {}),
+        }}
+        onClick={isClickable ? onClick : undefined}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => !isMenuOpen && setHover(false)}
+      >
+        {item.icon && (
+          <span
+            style={rowStyles.icon}
+            onClick={(e) => {
+              if (!hasChildren || !onToggleExpand) return;
+              e.stopPropagation();
+              onToggleExpand();
+            }}
+          >
+            {showChevron ? (
+              isExpanded ? (
+                <ExpandMore sx={{ fontSize: 18 }} />
+              ) : (
+                <ChevronRight sx={{ fontSize: 18 }} />
+              )
+            ) : (
+              item.icon
+            )}
+          </span>
+        )}
 
-        ...(isActive ? rowStyles.itemActive : {}),
-      }}
-      onClick={isClickable ? onClick : undefined}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      {item.icon && <span style={rowStyles.icon}>{item.icon}</span>}
-      <span style={rowStyles.label}>{item.label}</span>
+        <span style={rowStyles.label}>{item.label}</span>
 
-      {item.badge && !hover && (
-        <span style={rowStyles.badge}>{item.badge}</span>
-      )}
+        {item.badge && !hover && !isMenuOpen && (
+          <span style={rowStyles.badge}>{item.badge}</span>
+        )}
 
-      {hover && (onAddChildPage || onOpenDeleteMenu) && (
-        <div style={rowStyles.actions}>
-          {onOpenDeleteMenu && (
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenDeleteMenu();
-              }}
-            >
+        {(hover || isMenuOpen) && (
+          <div style={rowStyles.actions}>
+            <div onClick={handleMoreClick}>
               <HoverIconButton
                 icon={<MoreHoriz sx={{ fontSize: 16 }} />}
                 label="삭제, 복제 등..."
                 noBorder={true}
+                active={isMenuOpen}
               />
             </div>
-          )}
-          {onAddChildPage && (
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddChildPage();
-              }}
-            >
-              <HoverIconButton
-                icon={<Add sx={{ fontSize: 16 }} />}
-                label="하위 페이지 추가"
-                noBorder={true}
-              />
-            </div>
-          )}
-        </div>
-      )}
-    </li>
+
+            {onAddChildPage && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddChildPage();
+                }}
+              >
+                <HoverIconButton
+                  icon={<Add sx={{ fontSize: 16 }} />}
+                  label="하위 페이지 추가"
+                  noBorder={true}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </li>
+
+      <PageMenuOverlay
+        anchorEl={menuAnchorEl}
+        onClose={handleMenuClose}
+        onDelete={safeDelete}
+        onRename={safeRename}
+        updatedAt={updatedAt || new Date().toISOString()}
+      />
+    </>
   );
 };
 

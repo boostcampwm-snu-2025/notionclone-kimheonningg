@@ -1,6 +1,6 @@
 import type { PartialBlock } from "@blocknote/core";
 
-export const welcomeId = "welcome";
+export const NOTION_WELCOME_ID = "welcome";
 
 export const NOTION_WELCOME_ICON = "👋";
 
