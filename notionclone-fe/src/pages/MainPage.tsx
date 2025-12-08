@@ -8,6 +8,7 @@ import SearchOverlay from "../ui/overlay/SearchOverlay";
 import TrashCanOverlay from "../ui/overlay/TrashCanOverlay";
 import PageHeader from "../ui/editor/PageHeader";
 import PageEditor from "../ui/editor/PageEditor";
+import AIAssistantLauncher from "../ui/aiAssistant/AIAssistantLauncher";
 
 import { usePages } from "../hooks/usePages";
 import { getBreadcrumbs } from "../utils/breadCrumbs";
@@ -57,7 +58,12 @@ const MainPage = () => {
     activePageId,
     setActivePage,
     createPage,
+    permanentlyDeletePage,
+    tempDeletePage,
+    restoreTempDeletedPage,
     updatePageBlocks,
+    renamePageTitle,
+    modifyPageIcon,
   } = usePages();
 
   const handleSidebarItemClick = (id: string) => {
@@ -92,6 +98,8 @@ const MainPage = () => {
             icon={activePage.icon || "📄"}
             breadcrumbItems={breadcrumbItems}
             onBreadcrumbClick={(id) => setActivePage(id)}
+            onTitleChange={(title) => renamePageTitle(activePage.id, title)}
+            onIconChange={(icon) => modifyPageIcon(activePage.id, icon)}
           />
           <PageEditor
             // Reset editor component whenever page ID changes
@@ -122,7 +130,11 @@ const MainPage = () => {
         onItemClick={handleSidebarItemClick}
         pages={pages}
         rootIds={rootIds}
+        // Create root page
         onCreatePage={() => createPage(null)}
+        // Create child page under parent of parentId
+        onCreateChildPage={(parentId) => createPage(parentId)}
+        onDeletePage={tempDeletePage}
       />
       {collapsed && (
         <button
@@ -141,7 +153,15 @@ const MainPage = () => {
 
       {/* Overlays */}
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <TrashCanOverlay open={trashOpen} onClose={() => setTrashOpen(false)} />
+      <TrashCanOverlay
+        open={trashOpen}
+        onClose={() => setTrashOpen(false)}
+        onRestorePage={restoreTempDeletedPage}
+        onPermanentDeletePage={permanentlyDeletePage}
+      />
+
+      {/* AI Assistant */}
+      <AIAssistantLauncher />
     </div>
   );
 };
