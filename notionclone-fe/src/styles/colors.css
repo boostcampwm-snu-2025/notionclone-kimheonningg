@@ -22,4 +22,13 @@
   --pink-700: #d6336c;
   --pink-800: #c2255c;
   --pink-900: #a61e4d;
+
+  /* White */
+  --white: #ffffff;
+
+  /* Blue */
+  --blue-600: #228be6;
+
+  /* Red */
+  --red-500: #fa5252;
 }

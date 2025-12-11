@@ -22,7 +22,7 @@ const MarkdownRenderer = ({ content, isUser }: MarkdownRendererProps) => {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              color: isUser ? "white" : "#2563EB",
+              color: isUser ? "var(--white)" : "var(--blue-600)",
               textDecoration: "underline",
               fontWeight: 500,
             }}
@@ -49,8 +49,8 @@ const MarkdownRenderer = ({ content, isUser }: MarkdownRendererProps) => {
               style={{
                 background: isUser
                   ? "rgba(255,255,255,0.2)"
-                  : "rgba(0,0,0,0.06)",
-                color: isUser ? "inherit" : "#EB5757",
+                  : "var(--gray-100)",
+                color: isUser ? "inherit" : "var(--red-500)",
                 padding: "2px 5px",
                 borderRadius: 4,
                 fontSize: "0.9em",
@@ -95,12 +95,12 @@ const MarkdownRenderer = ({ content, isUser }: MarkdownRendererProps) => {
           <blockquote
             style={{
               borderLeft: `3px solid ${
-                isUser ? "rgba(255,255,255,0.5)" : "#d1d5db"
+                isUser ? "rgba(255,255,255,0.5)" : "var(--gray-400)"
               }`,
               margin: "6px 0",
               paddingLeft: 10,
               fontStyle: "italic",
-              color: isUser ? "rgba(255,255,255,0.9)" : "#4b5563",
+              color: isUser ? "rgba(255,255,255,0.9)" : "var(--gray-700)",
             }}
           >
             {children}
@@ -116,7 +116,7 @@ const MarkdownRenderer = ({ content, isUser }: MarkdownRendererProps) => {
                 fontSize: "0.9em",
                 border: isUser
                   ? "1px solid rgba(255,255,255,0.3)"
-                  : "1px solid #e5e7eb",
+                  : "1px solid var(--gray-300)",
               }}
             >
               {children}
@@ -128,9 +128,9 @@ const MarkdownRenderer = ({ content, isUser }: MarkdownRendererProps) => {
             style={{
               border: isUser
                 ? "1px solid rgba(255,255,255,0.3)"
-                : "1px solid #e5e7eb",
+                : "1px solid var(--gray-300)",
               padding: "6px 8px",
-              background: isUser ? "rgba(255,255,255,0.1)" : "#f9fafb",
+              background: isUser ? "rgba(255,255,255,0.1)" : "var(--gray-50)",
               fontWeight: 600,
             }}
           >
@@ -142,7 +142,7 @@ const MarkdownRenderer = ({ content, isUser }: MarkdownRendererProps) => {
             style={{
               border: isUser
                 ? "1px solid rgba(255,255,255,0.3)"
-                : "1px solid #e5e7eb",
+                : "1px solid var(--gray-300)",
               padding: "6px 8px",
             }}
           >
