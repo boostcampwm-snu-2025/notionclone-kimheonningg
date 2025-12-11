@@ -34,6 +34,9 @@
 - [x] 휴지통에서 지워야 localStorage에서 그 페이지 지움
 - [x] Sidebar의 개별 페이지에서 `>` 클릭 시 page hierarchy 보이도록
 - [x] AI assistant UI 생성
+
+### 3주차 (`week3` branch)
+
 - [ ] `/page`로 만든 페이지 아이템 클릭 시 그 페이지로 이동하는 기능
 - [ ] OPENAI API 연결
 - [ ] OPENAI API로 notion 작업할 수 있도록
