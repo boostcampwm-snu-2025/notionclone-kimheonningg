@@ -41,6 +41,7 @@
 - [x] OPENAI API 연결- 편의상 frontend에서 바로 연결
 - [ ] OPENAI API로 notion 작업할 수 있도록
 - [ ] 검색 기능 추가
+- [ ] Color system 재정리
 
 ## How to run this project
 

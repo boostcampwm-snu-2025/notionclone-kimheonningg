@@ -7,10 +7,14 @@ import {
   AutoAwesome,
   Translate,
   Search,
-  PlaylistAddCheckCircle,
 } from "@mui/icons-material";
 
-import { askOpenAI } from "../../utils/aiAssistant/openAiApi";
+import {
+  chatWithPageContext,
+  summarizeCurrentPage,
+  translateCurrentPage,
+  continueWritingPage,
+} from "../../utils/aiAssistant/aiAssistant";
 import type { ChatMessage } from "../../types/openai";
 
 const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
@@ -28,6 +32,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     justifyContent: "center",
     cursor: "pointer",
     zIndex: 1400,
+    border: "none",
   },
   floatingIcon: {
     display: "flex",
@@ -56,6 +61,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     display: "flex",
     alignItems: "center",
     gap: 10,
+    borderBottom: "1px solid #f3f4f6",
   },
   headerAvatar: {
     width: 32,
@@ -108,6 +114,10 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     gap: 8,
     fontSize: 13,
     color: "var(--gray-800)",
+    cursor: "pointer",
+    padding: "6px 8px",
+    borderRadius: 6,
+    transition: "background 0.2s",
   },
   suggestionIcon: {
     width: 22,
@@ -134,6 +144,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     color: "white",
     fontSize: 13,
     lineHeight: 1.4,
+    whiteSpace: "pre-wrap",
   },
   messageRowAssistant: {
     alignSelf: "flex-start",
@@ -144,11 +155,13 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     color: "var(--gray-900)",
     fontSize: 13,
     lineHeight: 1.4,
+    whiteSpace: "pre-wrap",
   },
   loadingText: {
     fontSize: 12,
     color: "var(--gray-500)",
     marginTop: 4,
+    marginLeft: 4,
   },
   inputWrapOuter: {
     borderTop: "1px solid var(--gray-200)",
@@ -190,6 +203,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     outline: "none",
     fontSize: 13,
     padding: 0,
+    background: "transparent",
   },
   sendButton: {
     width: 26,
@@ -217,18 +231,19 @@ const AIAssistantLauncher = () => {
 
   const handleToggle = () => setOpen((prev) => !prev);
 
-  const sendMessage = async () => {
-    const trimmed = input.trim();
-    if (!trimmed || loading) return;
+  // actionFn: AI function to run
+  // userLabel: Bubble text to show at UI
+  const processAIAction = async (
+    userLabel: string,
+    actionFn: () => Promise<string>
+  ) => {
+    if (loading) return;
 
-    // Clear other content and add text bubbles
-    setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
-
+    setMessages((prev) => [...prev, { role: "user", content: userLabel }]);
     setLoading(true);
-    try {
-      const reply = await askOpenAI(trimmed);
 
+    try {
+      const reply = await actionFn();
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (e) {
       console.error(e);
@@ -244,13 +259,40 @@ const AIAssistantLauncher = () => {
     }
   };
 
+  // Regular chatting
+  const sendMessage = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || loading) return;
+
+    setInput(""); // Init input
+
+    await processAIAction(trimmed, () => chatWithPageContext(trimmed));
+  };
+
   const handleSend = () => {
     void sendMessage();
   };
 
+  // Recommended chatting handlers
+  const handleContinueWriting = () => {
+    void processAIAction("이어서 써줘", continueWritingPage);
+  };
+
+  const handleTranslate = () => {
+    void processAIAction("이 페이지를 영어로 번역해줘", () =>
+      translateCurrentPage("English")
+    );
+  };
+
+  const handleSummarize = () => {
+    void processAIAction("이 페이지를 요약해줘", summarizeCurrentPage);
+  };
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (open) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, open]);
 
   return (
     <>
@@ -259,6 +301,7 @@ const AIAssistantLauncher = () => {
           type="button"
           style={aiAssistantLauncherStyles.floatingButton}
           onClick={handleToggle}
+          aria-label="AI Assistant 열기"
         >
           <div style={aiAssistantLauncherStyles.floatingIcon}>
             <EmojiEmotionsOutlined sx={{ fontSize: 26 }} />
@@ -279,6 +322,7 @@ const AIAssistantLauncher = () => {
               type="button"
               style={aiAssistantLauncherStyles.headerClose}
               onClick={handleToggle}
+              aria-label="닫기"
             >
               <Close sx={{ fontSize: 18 }} />
             </button>
@@ -293,32 +337,34 @@ const AIAssistantLauncher = () => {
                 </div>
 
                 <ul style={aiAssistantLauncherStyles.suggestionList}>
-                  <li style={aiAssistantLauncherStyles.suggestionItem}>
+                  <li
+                    style={aiAssistantLauncherStyles.suggestionItem}
+                    onClick={handleContinueWriting}
+                  >
                     <div style={aiAssistantLauncherStyles.suggestionIcon}>
                       <AutoAwesome sx={{ fontSize: 16 }} />
                     </div>
-                    <span>Notion AI 개인화하기</span>
+                    <span>이어서 쓰기 (Drafting)</span>
                   </li>
 
-                  <li style={aiAssistantLauncherStyles.suggestionItem}>
+                  <li
+                    style={aiAssistantLauncherStyles.suggestionItem}
+                    onClick={handleTranslate}
+                  >
                     <div style={aiAssistantLauncherStyles.suggestionIcon}>
                       <Translate sx={{ fontSize: 16 }} />
                     </div>
-                    <span>이 페이지 번역</span>
+                    <span>이 페이지 번역 (영어)</span>
                   </li>
 
-                  <li style={aiAssistantLauncherStyles.suggestionItem}>
+                  <li
+                    style={aiAssistantLauncherStyles.suggestionItem}
+                    onClick={handleSummarize}
+                  >
                     <div style={aiAssistantLauncherStyles.suggestionIcon}>
                       <Search sx={{ fontSize: 16 }} />
                     </div>
-                    <span>분석하여 인사이트 얻기</span>
-                  </li>
-
-                  <li style={aiAssistantLauncherStyles.suggestionItem}>
-                    <div style={aiAssistantLauncherStyles.suggestionIcon}>
-                      <PlaylistAddCheckCircle sx={{ fontSize: 16 }} />
-                    </div>
-                    <span>작업 트래커 만들기</span>
+                    <span>요약 및 인사이트</span>
                   </li>
                 </ul>
               </>
@@ -374,9 +420,13 @@ const AIAssistantLauncher = () => {
                 />
                 <button
                   type="button"
-                  style={aiAssistantLauncherStyles.sendButton}
+                  style={{
+                    ...aiAssistantLauncherStyles.sendButton,
+                    opacity: input.trim().length === 0 ? 0.5 : 1,
+                    cursor: input.trim().length === 0 ? "default" : "pointer",
+                  }}
                   onClick={handleSend}
-                  disabled={loading || input.trim().length === 0} // Disable
+                  disabled={loading || input.trim().length === 0}
                 >
                   <ArrowUpward sx={{ fontSize: 16 }} />
                 </button>
