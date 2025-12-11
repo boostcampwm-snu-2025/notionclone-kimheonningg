@@ -75,7 +75,7 @@ const searchStyles: Record<string, CSSProperties> = {
   },
   body: {
     flex: 1,
-    background: "#fff",
+    background: "var(--white)",
   },
 };
 

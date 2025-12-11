@@ -9,6 +9,8 @@ import {
   Search,
 } from "@mui/icons-material";
 
+import MarkdownRenderer from "./MarkdownRenderer";
+
 import {
   chatWithPageContext,
   summarizeCurrentPage,
@@ -25,7 +27,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     width: 48,
     height: 48,
     borderRadius: 999,
-    background: "white",
+    background: "var(--white)",
     boxShadow: "0 4px 12px rgba(0,0,0,0.18)",
     display: "flex",
     alignItems: "center",
@@ -48,7 +50,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     width: 420,
     maxWidth: "calc(100% - 32px)",
     maxHeight: "70vh",
-    background: "white",
+    background: "var(--white)",
     borderRadius: 16,
     boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
     display: "flex",
@@ -61,7 +63,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     display: "flex",
     alignItems: "center",
     gap: 10,
-    borderBottom: "1px solid #f3f4f6",
+    borderBottom: "1px solid var(--gray-100)",
   },
   headerAvatar: {
     width: 32,
@@ -113,7 +115,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     alignItems: "center",
     gap: 8,
     fontSize: 13,
-    color: "var(--gray-800)",
+    color: "var(--gray-700)",
     cursor: "pointer",
     padding: "6px 8px",
     borderRadius: 6,
@@ -133,18 +135,16 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     marginTop: 12,
     display: "flex",
     flexDirection: "column",
-    gap: 8,
+    gap: 12,
   },
   messageRowUser: {
     alignSelf: "flex-end",
     maxWidth: "80%",
     padding: "6px 10px",
     borderRadius: 12,
-    background: "#3B82F6",
-    color: "white",
+    background: "var(--blue-600)",
+    color: "var(--white)",
     fontSize: 13,
-    lineHeight: 1.4,
-    whiteSpace: "pre-wrap",
   },
   messageRowAssistant: {
     alignSelf: "flex-start",
@@ -154,8 +154,6 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     background: "var(--gray-100)",
     color: "var(--gray-900)",
     fontSize: 13,
-    lineHeight: 1.4,
-    whiteSpace: "pre-wrap",
   },
   loadingText: {
     fontSize: 12,
@@ -172,7 +170,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
   inputWrap: {
     borderRadius: 12,
     border: "1px solid var(--gray-300)",
-    background: "white",
+    background: "var(--white)",
     padding: "8px 10px 6px",
     display: "flex",
     flexDirection: "column",
@@ -204,6 +202,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     fontSize: 13,
     padding: 0,
     background: "transparent",
+    resize: "none",
   },
   sendButton: {
     width: 26,
@@ -211,7 +210,7 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     borderRadius: 999,
     border: "none",
     background: "var(--gray-900)",
-    color: "white",
+    color: "var(--white)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -381,7 +380,10 @@ const AIAssistantLauncher = () => {
                       : aiAssistantLauncherStyles.messageRowAssistant
                   }
                 >
-                  {message.content}
+                  <MarkdownRenderer
+                    content={message.content}
+                    isUser={message.role === "user"}
+                  />
                 </div>
               ))}
 

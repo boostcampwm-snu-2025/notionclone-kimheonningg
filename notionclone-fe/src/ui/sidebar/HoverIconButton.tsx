@@ -46,7 +46,7 @@ const hoverIconButtonStyles: Record<string, CSSProperties> = {
     padding: "4px 10px",
     borderRadius: 4,
     background: "var(--gray-900)",
-    color: "#fff",
+    color: "var(--white)",
     fontSize: 11,
     whiteSpace: "nowrap",
     pointerEvents: "none",
