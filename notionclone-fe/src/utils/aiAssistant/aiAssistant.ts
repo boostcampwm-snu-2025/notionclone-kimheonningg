@@ -3,7 +3,7 @@ import type { Block } from "@blocknote/core";
 import { askOpenAIWithSystemPrompt } from "./openAiApi";
 import { loadInitialPageState } from "../storage/pageStorage";
 
-import { DEFAULT_PAGE_ICON } from "../../constants/page";
+import { DEFAULT_PAGE_ICON, NO_TITLE_PAGE_TITLE } from "../../constants/page";
 
 const serializeBlocksToText = (blocks: Block[] | undefined | null): string => {
   if (!blocks || !Array.isArray(blocks) || blocks.length === 0) {
@@ -37,7 +37,7 @@ const getCurrentPageContext = () => {
 
   // Make context object for AI
   return {
-    title: activePage.title || "제목 없음",
+    title: activePage.title || NO_TITLE_PAGE_TITLE,
     icon: activePage.icon || DEFAULT_PAGE_ICON,
     content: serializeBlocksToText(blocks),
     updatedAt: activePage.updatedAt,
