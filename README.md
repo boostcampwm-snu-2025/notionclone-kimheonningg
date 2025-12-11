@@ -38,7 +38,7 @@
 ### 3주차 (`week3` branch)
 
 - [ ] `/page`로 만든 페이지 아이템 클릭 시 그 페이지로 이동하는 기능
-- [ ] OPENAI API 연결
+- [x] OPENAI API 연결- 편의상 frontend에서 바로 연결
 - [ ] OPENAI API로 notion 작업할 수 있도록
 - [ ] 검색 기능 추가
 
