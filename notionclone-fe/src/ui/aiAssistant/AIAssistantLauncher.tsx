@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import {
   EmojiEmotionsOutlined,
@@ -9,6 +9,9 @@ import {
   Search,
   PlaylistAddCheckCircle,
 } from "@mui/icons-material";
+
+import { askOpenAI } from "../../utils/aiAssistant/openAiApi";
+import type { ChatMessage } from "../../types/openai";
 
 const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
   floatingButton: {
@@ -80,11 +83,11 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     color: "var(--gray-500)",
   },
   body: {
-    padding: "50px 16px 16px",
+    flex: 1,
+    padding: "16px",
     fontSize: 13,
     color: "var(--gray-800)",
     overflowY: "auto",
-    height: 300,
   },
   bodyTitle: {
     fontSize: 18,
@@ -116,10 +119,42 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     justifyContent: "center",
     flexShrink: 0,
   },
+  messagesList: {
+    marginTop: 12,
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+  },
+  messageRowUser: {
+    alignSelf: "flex-end",
+    maxWidth: "80%",
+    padding: "6px 10px",
+    borderRadius: 12,
+    background: "#3B82F6",
+    color: "white",
+    fontSize: 13,
+    lineHeight: 1.4,
+  },
+  messageRowAssistant: {
+    alignSelf: "flex-start",
+    maxWidth: "80%",
+    padding: "6px 10px",
+    borderRadius: 12,
+    background: "var(--gray-100)",
+    color: "var(--gray-900)",
+    fontSize: 13,
+    lineHeight: 1.4,
+  },
+  loadingText: {
+    fontSize: 12,
+    color: "var(--gray-500)",
+    marginTop: 4,
+  },
   inputWrapOuter: {
     borderTop: "1px solid var(--gray-200)",
     padding: "10px 14px 12px",
     background: "var(--gray-50)",
+    flexShrink: 0,
   },
   inputWrap: {
     borderRadius: 12,
@@ -174,15 +209,48 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
 const AIAssistantLauncher = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // For scrolls
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => setOpen((prev) => !prev);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    // TODO: Connect with OpenAi API later
-    console.log("LLM query:", input);
+  const sendMessage = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || loading) return;
+
+    // Clear other content and add text bubbles
     setInput("");
+    setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
+
+    setLoading(true);
+    try {
+      const reply = await askOpenAI(trimmed);
+
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    } catch (e) {
+      console.error(e);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "AI 응답을 가져오는 중 오류가 발생했습니다.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSend = () => {
+    void sendMessage();
+  };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <>
@@ -218,51 +286,74 @@ const AIAssistantLauncher = () => {
 
           {/* body */}
           <div style={aiAssistantLauncherStyles.body}>
-            <div style={aiAssistantLauncherStyles.bodyTitle}>
-              무엇을 도와드릴까요?
-            </div>
+            {messages.length === 0 ? (
+              <>
+                <div style={aiAssistantLauncherStyles.bodyTitle}>
+                  무엇을 도와드릴까요?
+                </div>
 
-            <ul style={aiAssistantLauncherStyles.suggestionList}>
-              <li style={aiAssistantLauncherStyles.suggestionItem}>
-                <div style={aiAssistantLauncherStyles.suggestionIcon}>
-                  <AutoAwesome sx={{ fontSize: 16 }} />
+                <ul style={aiAssistantLauncherStyles.suggestionList}>
+                  <li style={aiAssistantLauncherStyles.suggestionItem}>
+                    <div style={aiAssistantLauncherStyles.suggestionIcon}>
+                      <AutoAwesome sx={{ fontSize: 16 }} />
+                    </div>
+                    <span>Notion AI 개인화하기</span>
+                  </li>
+
+                  <li style={aiAssistantLauncherStyles.suggestionItem}>
+                    <div style={aiAssistantLauncherStyles.suggestionIcon}>
+                      <Translate sx={{ fontSize: 16 }} />
+                    </div>
+                    <span>이 페이지 번역</span>
+                  </li>
+
+                  <li style={aiAssistantLauncherStyles.suggestionItem}>
+                    <div style={aiAssistantLauncherStyles.suggestionIcon}>
+                      <Search sx={{ fontSize: 16 }} />
+                    </div>
+                    <span>분석하여 인사이트 얻기</span>
+                  </li>
+
+                  <li style={aiAssistantLauncherStyles.suggestionItem}>
+                    <div style={aiAssistantLauncherStyles.suggestionIcon}>
+                      <PlaylistAddCheckCircle sx={{ fontSize: 16 }} />
+                    </div>
+                    <span>작업 트래커 만들기</span>
+                  </li>
+                </ul>
+              </>
+            ) : null}
+
+            {/* Chat messages */}
+            <div style={aiAssistantLauncherStyles.messagesList}>
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  style={
+                    message.role === "user"
+                      ? aiAssistantLauncherStyles.messageRowUser
+                      : aiAssistantLauncherStyles.messageRowAssistant
+                  }
+                >
+                  {message.content}
                 </div>
-                <span>Notion AI 개인화하기</span>
-              </li>
-              <li style={aiAssistantLauncherStyles.suggestionItem}>
-                <div style={aiAssistantLauncherStyles.suggestionIcon}>
-                  <Translate sx={{ fontSize: 16 }} />
+              ))}
+
+              {loading && (
+                <div style={aiAssistantLauncherStyles.loadingText}>
+                  AI가 답변을 생성하는 중...
                 </div>
-                <span>이 페이지 번역</span>
-              </li>
-              <li style={aiAssistantLauncherStyles.suggestionItem}>
-                <div style={aiAssistantLauncherStyles.suggestionIcon}>
-                  <Search sx={{ fontSize: 16 }} />
-                </div>
-                <span>분석하여 인사이트 얻기</span>
-              </li>
-              <li style={aiAssistantLauncherStyles.suggestionItem}>
-                <div style={aiAssistantLauncherStyles.suggestionIcon}>
-                  <PlaylistAddCheckCircle sx={{ fontSize: 16 }} />
-                </div>
-                <span>작업 트래커 만들기</span>
-              </li>
-            </ul>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
           </div>
 
           {/* Text input area */}
           <div style={aiAssistantLauncherStyles.inputWrapOuter}>
             <div style={aiAssistantLauncherStyles.inputWrap}>
               <div style={aiAssistantLauncherStyles.inputTagsRow}>
-                <span
-                  style={{
-                    fontSize: 11,
-                    padding: "2px 6px",
-                    borderRadius: 999,
-                    background: "var(--gray-100)",
-                    color: "var(--gray-800)",
-                  }}
-                >
+                <span style={aiAssistantLauncherStyles.inputTag}>
                   👋 Notion에 오신 것을 환영합니다!
                 </span>
               </div>
@@ -284,6 +375,7 @@ const AIAssistantLauncher = () => {
                   type="button"
                   style={aiAssistantLauncherStyles.sendButton}
                   onClick={handleSend}
+                  disabled={loading || input.trim().length === 0} // Disable
                 >
                   <ArrowUpward sx={{ fontSize: 16 }} />
                 </button>
