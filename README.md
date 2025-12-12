@@ -170,3 +170,20 @@ This project will open at `http://localhost:5173`
 
 - 우측 하단의 아이콘 클릭시 나오는 AI Assistant- 현재 page를 감지해서 input section에 현재 페이지 표시 및 현재 페이지를 기준으로 작업을 진행함
   ![AIAssistant](./assets/AIAssistant.png)
+
+### Week 3
+
+- 작동하는 AI Assistant- 기본적인 질문 가능
+  ![AIFunctionBasic](./assets/AIFunctionBasic.png)
+
+- 작동하는 AI Assistant- 현재 페이지 요약 가능
+  ![AIFunctionSummarize](./assets/AIFunctionSummarize.png)
+
+- 작동하는 AI Assistant- 현재 페이지 번역 가능
+  ![AIFunctionTranslate](./assets/AIFunctionTranslate.png)
+
+- 작동하는 AI Assistant- 현재 페이지에서 새로운 자식 페이지 생성 가능
+  ![AIFunctionMakeNewPage](./assets/AIFunctionMakeNewPage.png)
+
+- `SearchOverlay`에 검색 기능 추가
+  ![SearchOverlayFunctions](./assets/SearchOverlayFunctions.png)
