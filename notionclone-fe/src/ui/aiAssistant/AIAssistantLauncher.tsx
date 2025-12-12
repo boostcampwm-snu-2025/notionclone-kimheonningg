@@ -7,6 +7,7 @@ import {
   AutoAwesome,
   Translate,
   Search,
+  PlaylistAddCheckCircle,
 } from "@mui/icons-material";
 
 import MarkdownRenderer from "./MarkdownRenderer";
@@ -19,7 +20,10 @@ import {
 } from "../../utils/aiAssistant/aiAssistant";
 import type { ChatMessage } from "../../types/openai";
 
-import { loadInitialPageState } from "../../utils/storage/pageStorage";
+import {
+  loadInitialPageState,
+  createChildPageWithBlocks,
+} from "../../utils/storage/pageStorage";
 
 import { NO_TITLE_PAGE_TITLE, DEFAULT_PAGE_ICON } from "../../constants/page";
 
@@ -235,6 +239,9 @@ const AIAssistantLauncher = () => {
   // current Page title
   const [pageTitle, setPageTitle] = useState(NO_TITLE_PAGE_TITLE);
 
+  // State to track if we are waiting for a page topic
+  const [isWaitingForTopic, setIsWaitingForTopic] = useState(false);
+
   // For scrolls
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -299,18 +306,72 @@ const AIAssistantLauncher = () => {
     }
   };
 
-  // Regular chatting
-  const sendMessage = async () => {
+  // Safe function to create a page with predefined blocks
+  const createSafePage = (topic: string) => {
+    const taskTrackerBlocks = [
+      {
+        type: "heading",
+        content: "Project Tasks",
+        props: { level: 1 },
+      },
+      {
+        type: "paragraph",
+        content: `Tasks for: ${topic}`,
+      },
+      {
+        type: "checkListItem",
+        content: "Initial Planning",
+      },
+      {
+        type: "checkListItem",
+        content: "Execution Phase",
+      },
+    ];
+
+    createChildPageWithBlocks(topic || "New Page", taskTrackerBlocks);
+    window.location.reload();
+  };
+
+  const handleSendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed || loading) return;
 
-    setInput(""); // Init input
+    setInput("");
 
+    // Check if we are in the "create page" flow
+    if (isWaitingForTopic) {
+      setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
+      setLoading(true);
+
+      try {
+        // Instead of AI generation, use the safe creation logic
+        createSafePage(trimmed);
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: `'${trimmed}' 주제로 새 페이지가 생성되었습니다.`,
+          },
+        ]);
+      } catch (e) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: "페이지 생성 중 오류가 발생했습니다." },
+        ]);
+      } finally {
+        setLoading(false);
+        setIsWaitingForTopic(false); // Reset the flow
+      }
+      return;
+    }
+
+    // Regular chatting
     await processAIAction(trimmed, () => chatWithPageContext(trimmed));
   };
 
   const handleSend = () => {
-    void sendMessage();
+    void handleSendMessage();
   };
 
   // Recommended chatting handlers
@@ -326,6 +387,20 @@ const AIAssistantLauncher = () => {
 
   const handleSummarize = () => {
     void processAIAction("이 페이지를 요약해줘", summarizeCurrentPage);
+  };
+
+  // Handler to initiate page creation flow
+  const handleInitiateCreatePage = () => {
+    const label = "새 페이지 만들기";
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: label },
+      {
+        role: "assistant",
+        content: "어떤 주제로 페이지를 만들까요? 주제를 입력해주세요.",
+      },
+    ]);
+    setIsWaitingForTopic(true); // Set state to wait for user input
   };
 
   useEffect(() => {
@@ -405,6 +480,16 @@ const AIAssistantLauncher = () => {
                       <Search sx={{ fontSize: 16 }} />
                     </div>
                     <span>요약 및 인사이트</span>
+                  </li>
+
+                  <li
+                    style={aiAssistantLauncherStyles.suggestionItem}
+                    onClick={handleInitiateCreatePage}
+                  >
+                    <div style={aiAssistantLauncherStyles.suggestionIcon}>
+                      <PlaylistAddCheckCircle sx={{ fontSize: 16 }} />
+                    </div>
+                    <span>새 페이지 만들기</span>
                   </li>
                 </ul>
               </>
