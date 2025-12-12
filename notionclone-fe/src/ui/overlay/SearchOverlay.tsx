@@ -12,6 +12,8 @@ import {
 } from "@mui/icons-material";
 
 import { USER_NAME } from "../../constants/userName";
+import { NO_TITLE_PAGE_TITLE } from "../../constants/page";
+
 import { loadInitialPageState } from "../../utils/storage/pageStorage";
 import type { Page } from "../../types/page";
 import { formatDate } from "../../utils/date";
@@ -23,7 +25,7 @@ interface SearchOverlayProps {
   onNavigate?: (pageId: string) => void;
 }
 
-const searchStyles: Record<string, CSSProperties> = {
+const searchOverlayStyles: Record<string, CSSProperties> = {
   backdrop: {
     position: "fixed",
     inset: 0,
@@ -147,6 +149,15 @@ const searchStyles: Record<string, CSSProperties> = {
     fontSize: 14,
     gap: 8,
   },
+  footer: {
+    padding: "8px 16px",
+    borderTop: "1px solid var(--gray-200)",
+    fontSize: 12,
+    color: "var(--gray-500)",
+    display: "flex",
+    justifyContent: "space-between",
+    background: "var(--gray-50)",
+  },
 };
 
 const SearchOverlay = ({ open, onClose, onNavigate }: SearchOverlayProps) => {
@@ -195,47 +206,47 @@ const SearchOverlay = ({ open, onClose, onNavigate }: SearchOverlayProps) => {
   if (!open) return null;
 
   return (
-    <div style={searchStyles.backdrop} onClick={handleBackdropClick}>
-      <div style={searchStyles.panel}>
-        <header style={searchStyles.header}>
+    <div style={searchOverlayStyles.backdrop} onClick={handleBackdropClick}>
+      <div style={searchOverlayStyles.panel}>
+        <header style={searchOverlayStyles.header}>
           <form
-            style={searchStyles.searchRow}
+            style={searchOverlayStyles.searchRow}
             onSubmit={(e) => e.preventDefault()}
           >
-            <div style={searchStyles.searchIcon}>
+            <div style={searchOverlayStyles.searchIcon}>
               <Search fontSize="medium" />
             </div>
             <input
               autoFocus
-              style={searchStyles.input}
+              style={searchOverlayStyles.input}
               placeholder={`${USER_NAME}님의 워크스페이스에서 검색 또는 질문`}
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
             />
-            <div style={searchStyles.rightIconWrap}>
+            <div style={searchOverlayStyles.rightIconWrap}>
               <span>ESC</span>
             </div>
           </form>
         </header>
 
         {/* Body + Search results */}
-        <div style={searchStyles.body}>
+        <div style={searchOverlayStyles.body}>
           {!keyword ? (
-            <div style={searchStyles.emptyState}>
+            <div style={searchOverlayStyles.emptyState}>
               <span>검색어를 입력하여 페이지를 찾아보세요.</span>
             </div>
           ) : filteredPages.length === 0 ? (
-            <div style={searchStyles.emptyState}>
+            <div style={searchOverlayStyles.emptyState}>
               <span>'{keyword}'에 대한 검색 결과가 없습니다.</span>
             </div>
           ) : (
             <>
-              <div style={searchStyles.sectionTitle}>결과 상위 일치</div>
+              <div style={searchOverlayStyles.sectionTitle}>결과 상위 일치</div>
               {filteredPages.map((page) => (
                 <div
                   key={page.id}
                   style={{
-                    ...searchStyles.resultItem,
+                    ...searchOverlayStyles.resultItem,
                     background:
                       hoveredId === page.id ? "var(--gray-100)" : "transparent",
                   }}
@@ -243,7 +254,7 @@ const SearchOverlay = ({ open, onClose, onNavigate }: SearchOverlayProps) => {
                   onMouseLeave={() => setHoveredId(null)}
                   onClick={() => handleItemClick(page.id)}
                 >
-                  <div style={searchStyles.resultIconBox}>
+                  <div style={searchOverlayStyles.resultIconBox}>
                     {page.icon ? (
                       page.icon
                     ) : (
@@ -251,11 +262,11 @@ const SearchOverlay = ({ open, onClose, onNavigate }: SearchOverlayProps) => {
                     )}
                   </div>
 
-                  <div style={searchStyles.resultContent}>
-                    <div style={searchStyles.resultTitle}>
-                      {page.title || "제목 없음"}
+                  <div style={searchOverlayStyles.resultContent}>
+                    <div style={searchOverlayStyles.resultTitle}>
+                      {page.title || NO_TITLE_PAGE_TITLE}
                     </div>
-                    <div style={searchStyles.resultMeta}>
+                    <div style={searchOverlayStyles.resultMeta}>
                       {USER_NAME} • 편집 시간: {formatDate(page.updatedAt)}
                     </div>
                   </div>
@@ -275,17 +286,7 @@ const SearchOverlay = ({ open, onClose, onNavigate }: SearchOverlayProps) => {
           )}
         </div>
 
-        <div
-          style={{
-            padding: "8px 16px",
-            borderTop: "1px solid var(--gray-200)",
-            fontSize: 12,
-            color: "var(--gray-500)",
-            display: "flex",
-            justifyContent: "space-between",
-            background: "var(--gray-50)",
-          }}
-        >
+        <div style={searchOverlayStyles.footer}>
           <span>
             <b style={{ fontWeight: 600 }}>↑↓</b> 이동
             <b style={{ fontWeight: 600, marginLeft: 8 }}>Enter</b> 열기
