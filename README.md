@@ -154,4 +154,19 @@ This project will open at `http://localhost:5173`
 
   ![TrashCanOverlay](./assets/TrashCanOverlay.png)
 
-### Weeks 2 & 3
+### Week 2
+
+- Header icon 및 제목 편집 가능
+  ![EditableHeader](./assets/EditableHeader.png)
+
+- 개별 페이지의 `...` 클릭 시 (`PageMenuOverlay` component)- `휴지통으로 이동` 기능 구현 완료
+  ![PageMenuOverlay](./assets/PageMenuOverlay.png)
+
+- `휴지통` 클릭 시 기능 추가- 영구 삭제 및 복구 가능
+  ![TrashCanOverlayFunctions](./assets/TrashCanOverlayFunctions.png)
+
+- 개별 페이지의 `+` 클릭 시 하위 페이지 생성 기능
+  ![PageCreateAndHierarchy](./assets/PageCreateAndHierarchy.png)
+
+- 우측 하단의 아이콘 클릭시 나오는 AI Assistant- 현재 page를 감지해서 input section에 현재 페이지 표시 및 현재 페이지를 기준으로 작업을 진행함
+  ![AIAssistant](./assets/AIAssistant.png)
