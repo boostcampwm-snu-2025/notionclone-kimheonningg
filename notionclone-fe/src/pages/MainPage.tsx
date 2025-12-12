@@ -135,7 +135,7 @@ const MainPage = () => {
         // Create root page
         onCreatePage={() => createPage(null)}
         // Create child page under parent of parentId
-        onCreateChildPage={(parentId) => createPage(parentId)}
+        onCreateChildPage={createPage}
         onDeletePage={tempDeletePage}
       />
       {collapsed && (
