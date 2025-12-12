@@ -42,7 +42,8 @@
   - [x] 이어서 쓰기 기능
   - [x] 번역 기능
   - [x] 요약 및 인사이트 기능
-- [ ] 검색 기능 추가
+  - [ ] 새로운 페이지 생성
+- [x] 검색 기능 추가
 - [x] Color system 재정리
 - [x] 각 페이지에 맞게 AI Assistant의 UI도 변경되도록
 
@@ -152,3 +153,5 @@ This project will open at `http://localhost:5173`
 - `휴지통` 클릭 시 (`TrashCanOverlay` component)
 
   ![TrashCanOverlay](./assets/TrashCanOverlay.png)
+
+### Weeks 2 & 3

@@ -154,7 +154,11 @@ const MainPage = () => {
       </div>
 
       {/* Overlays */}
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchOverlay
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onNavigate={(id) => setActivePage(id)}
+      />
       <TrashCanOverlay
         open={trashOpen}
         onClose={() => setTrashOpen(false)}
