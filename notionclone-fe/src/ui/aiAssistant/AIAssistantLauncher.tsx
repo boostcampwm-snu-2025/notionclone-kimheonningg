@@ -19,6 +19,10 @@ import {
 } from "../../utils/aiAssistant/aiAssistant";
 import type { ChatMessage } from "../../types/openai";
 
+import { loadInitialPageState } from "../../utils/storage/pageStorage";
+
+import { NO_TITLE_PAGE_TITLE, DEFAULT_PAGE_ICON } from "../../constants/page";
+
 const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
   floatingButton: {
     position: "fixed",
@@ -188,6 +192,10 @@ const aiAssistantLauncherStyles: Record<string, CSSProperties> = {
     borderRadius: 999,
     background: "var(--gray-100)",
     color: "var(--gray-700)",
+    maxWidth: "100%",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
   inputTextRow: {
     display: "flex",
@@ -224,11 +232,44 @@ const AIAssistantLauncher = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  // current Page title
+  const [pageTitle, setPageTitle] = useState(NO_TITLE_PAGE_TITLE);
 
   // For scrolls
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => setOpen((prev) => !prev);
+
+  const fetchCurrentPageTitle = () => {
+    const state = loadInitialPageState();
+    if (!state || !state.activeId) return;
+
+    const activePage = state.pages[state.activeId];
+    if (activePage) {
+      const icon = activePage.icon ? `${activePage.icon} ` : DEFAULT_PAGE_ICON;
+      const title = activePage.title || NO_TITLE_PAGE_TITLE;
+      setPageTitle(`${icon}${title}`);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentPageTitle();
+
+    const handleStorageUpdate = () => {
+      fetchCurrentPageTitle();
+    };
+
+    window.addEventListener("local-storage-page-update", handleStorageUpdate);
+    window.addEventListener("storage", handleStorageUpdate);
+
+    return () => {
+      window.removeEventListener(
+        "local-storage-page-update",
+        handleStorageUpdate
+      );
+      window.removeEventListener("storage", handleStorageUpdate);
+    };
+  }, [open]);
 
   // actionFn: AI function to run
   // userLabel: Bubble text to show at UI
@@ -402,7 +443,7 @@ const AIAssistantLauncher = () => {
             <div style={aiAssistantLauncherStyles.inputWrap}>
               <div style={aiAssistantLauncherStyles.inputTagsRow}>
                 <span style={aiAssistantLauncherStyles.inputTag}>
-                  👋 Notion에 오신 것을 환영합니다!
+                  {pageTitle}
                 </span>
               </div>
 

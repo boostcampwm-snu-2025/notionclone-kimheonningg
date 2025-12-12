@@ -37,11 +37,14 @@
 
 ### 3주차 (`week3` branch)
 
-- [ ] `/page`로 만든 페이지 아이템 클릭 시 그 페이지로 이동하는 기능
 - [x] OPENAI API 연결- 편의상 frontend에서 바로 연결
 - [x] OPENAI API로 notion 작업할 수 있도록
+  - [x] 이어서 쓰기 기능
+  - [x] 번역 기능
+  - [x] 요약 및 인사이트 기능
 - [ ] 검색 기능 추가
 - [x] Color system 재정리
+- [x] 각 페이지에 맞게 AI Assistant의 UI도 변경되도록
 
 ## How to run this project
 
