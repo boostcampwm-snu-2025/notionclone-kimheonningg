@@ -60,7 +60,7 @@ const MainPage = () => {
     activePageId,
     setActivePage,
     createPage,
-    permanentlyDeletePage,
+    deletePagePermanently,
     tempDeletePage,
     restoreTempDeletedPage,
     updatePageBlocks,
@@ -163,7 +163,7 @@ const MainPage = () => {
         open={trashOpen}
         onClose={() => setTrashOpen(false)}
         onRestorePage={restoreTempDeletedPage}
-        onPermanentDeletePage={permanentlyDeletePage}
+        onPermanentDeletePage={deletePagePermanently}
       />
 
       {/* AI Assistant */}

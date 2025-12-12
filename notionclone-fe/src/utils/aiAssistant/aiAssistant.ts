@@ -1,6 +1,6 @@
 import type { Block } from "@blocknote/core";
 
-import { askOpenAIWithSystemPrompt } from "./openAiApi";
+import { askOpenAIWithSystemPrompt } from "./openAIApi";
 import { loadInitialPageState } from "../storage/pageStorage";
 
 import { DEFAULT_PAGE_ICON, NO_TITLE_PAGE_TITLE } from "../../constants/page";
