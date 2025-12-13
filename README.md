@@ -2,6 +2,10 @@
 
 전기정보공학부 김희원 개인 프로젝트
 
+## Demo video
+
+https://www.youtube.com/watch?v=aHE7seTQfSg
+
 ## Plan
 
 2주차에 시험(기말고사)이 많아서 1주차에 2주차의 개발 대부분까지 하려고 합니다.. ㅠㅠ
