@@ -72,7 +72,7 @@ const sidebarStyles: Record<string, CSSProperties> = {
     height: 26,
     borderRadius: 6,
     background: "var(--gray-900)",
-    color: "#fff",
+    color: "var(--white)",
     fontSize: 13,
     fontWeight: 600,
     display: "flex",

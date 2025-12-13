@@ -1,6 +1,8 @@
 import { DescriptionOutlined } from "@mui/icons-material";
 import type { BlockNoteEditor } from "@blocknote/core";
 
+import { DEFAULT_PAGE_ICON } from "../page";
+
 export const NewPageSlashItem = (
   editor: BlockNoteEditor,
   onCreateChildPage: () => string
@@ -20,7 +22,7 @@ export const NewPageSlashItem = (
       content: [
         {
           type: "text",
-          text: "📄 새 페이지",
+          text: `${DEFAULT_PAGE_ICON} 새 페이지`,
           styles: { bold: true },
         },
       ],

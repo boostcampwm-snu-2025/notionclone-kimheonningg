@@ -209,7 +209,7 @@ export const usePages = () => {
   };
 
   // Permanent deletion
-  const permanentlyDeletePage = (id: string) => {
+  const deletePagePermanently = (id: string) => {
     setState((prev) => {
       let nextPages = { ...prev.pages };
       let nextRootIds = [...prev.rootIds];
@@ -327,7 +327,7 @@ export const usePages = () => {
     createPage,
     tempDeletePage,
     restoreTempDeletedPage,
-    permanentlyDeletePage,
+    deletePagePermanently,
     renamePageTitle,
     modifyPageIcon,
     updatePageBlocks,

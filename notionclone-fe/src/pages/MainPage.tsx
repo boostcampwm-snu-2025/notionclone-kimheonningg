@@ -13,6 +13,8 @@ import AIAssistantLauncher from "../ui/aiAssistant/AIAssistantLauncher";
 import { usePages } from "../hooks/usePages";
 import { getBreadcrumbs } from "../utils/breadCrumbs";
 
+import { DEFAULT_PAGE_ICON } from "../constants/page";
+
 const mainPageStyles: Record<string, CSSProperties> = {
   wrap: {
     display: "flex",
@@ -58,7 +60,7 @@ const MainPage = () => {
     activePageId,
     setActivePage,
     createPage,
-    permanentlyDeletePage,
+    deletePagePermanently,
     tempDeletePage,
     restoreTempDeletedPage,
     updatePageBlocks,
@@ -95,7 +97,7 @@ const MainPage = () => {
         <>
           <PageHeader
             title={activePage.title}
-            icon={activePage.icon || "📄"}
+            icon={activePage.icon || DEFAULT_PAGE_ICON}
             breadcrumbItems={breadcrumbItems}
             onBreadcrumbClick={(id) => setActivePage(id)}
             onTitleChange={(title) => renamePageTitle(activePage.id, title)}
@@ -133,7 +135,7 @@ const MainPage = () => {
         // Create root page
         onCreatePage={() => createPage(null)}
         // Create child page under parent of parentId
-        onCreateChildPage={(parentId) => createPage(parentId)}
+        onCreateChildPage={createPage}
         onDeletePage={tempDeletePage}
       />
       {collapsed && (
@@ -152,12 +154,16 @@ const MainPage = () => {
       </div>
 
       {/* Overlays */}
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchOverlay
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onNavigate={(id) => setActivePage(id)}
+      />
       <TrashCanOverlay
         open={trashOpen}
         onClose={() => setTrashOpen(false)}
         onRestorePage={restoreTempDeletedPage}
-        onPermanentDeletePage={permanentlyDeletePage}
+        onPermanentDeletePage={deletePagePermanently}
       />
 
       {/* AI Assistant */}

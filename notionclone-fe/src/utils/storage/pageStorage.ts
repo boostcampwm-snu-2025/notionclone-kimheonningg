@@ -1,4 +1,4 @@
-import type { PageState, TempDeletedPageState } from "../../types/page";
+import type { PageState, Page, TempDeletedPageState } from "../../types/page";
 
 import {
   NOTION_WELCOME_ID,
@@ -12,6 +12,8 @@ import {
   DELETED_PAGE_STORAGE_KEY,
 } from "../../constants/localStorageKey";
 
+import { DEFAULT_PAGE_ICON } from "../../constants/page";
+
 export const loadInitialPageState = (): PageState => {
   if (typeof window !== "undefined") {
     try {
@@ -24,8 +26,6 @@ export const loadInitialPageState = (): PageState => {
       console.warn("Failed to load pages from storage", error);
     }
   }
-
-  // FIXME: Initially one basic page
 
   return {
     pages: {
@@ -81,4 +81,31 @@ export const saveTempDeletedPageState = (
   } catch (error) {
     console.warn("Failed to save deleted pages", error);
   }
+};
+
+export const createChildPageWithBlocks = (title: string, blocks: any[]) => {
+  const state = loadInitialPageState();
+  if (!state || !state.activeId) return;
+
+  const newPageId = crypto.randomUUID();
+  const now = new Date().toISOString();
+
+  const newPage: Page = {
+    id: newPageId,
+    parentId: state.activeId, // Current page will be the parent
+    title: title,
+    icon: DEFAULT_PAGE_ICON,
+    blocks: blocks,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  // Update state
+  state.pages[newPageId] = newPage;
+
+  savePageState(state);
+
+  // Move to generated page
+  state.activeId = newPageId;
+  savePageState(state);
 };
