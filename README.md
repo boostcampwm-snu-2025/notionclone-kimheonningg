@@ -6,6 +6,10 @@
 
 https://www.youtube.com/watch?v=aHE7seTQfSg
 
+### 프로젝트 설명
+
+Notion clone은 `blocknote` 라이브러리를 기반으로 Notion의 핵심 UI와 block editor 아키텍쳐를 정교하게 구현한 프로젝트입니다. Local storage를 사용해 복잡한 페이지 계층 구조와 휴지통 로직(임시 삭제, 영구 삭제, 임시 삭제 복구)을 안정적으로 관리하며, Breadcrumb과 sidebar navigation을 통해 매끄러운 UX를 제공합니다. 또, AI Assistant도 도입되어, 현재 페이지의 문맥을 실시간으로 파악하여 현재 페이지 요약, 번역, 이어 쓰기, 하위의 새로운 페이지 생성 등의 기능을 지원합니다.
+
 ## Plan
 
 2주차에 시험(기말고사)이 많아서 1주차에 2주차의 개발 대부분까지 하려고 합니다.. ㅠㅠ
