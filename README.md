@@ -2,6 +2,14 @@
 
 전기정보공학부 김희원 개인 프로젝트
 
+## Demo video
+
+https://www.youtube.com/watch?v=aHE7seTQfSg
+
+### 프로젝트 설명
+
+Notion clone은 `blocknote` 라이브러리를 기반으로 Notion의 핵심 UI와 block editor 아키텍쳐를 정교하게 구현한 프로젝트입니다. Local storage를 사용해 복잡한 페이지 계층 구조와 휴지통 로직(임시 삭제, 영구 삭제, 임시 삭제 복구)을 안정적으로 관리하며, Breadcrumb과 sidebar navigation을 통해 매끄러운 UX를 제공합니다. 또, AI Assistant도 도입되어, 현재 페이지의 문맥을 실시간으로 파악하여 현재 페이지 요약, 번역, 이어 쓰기, 하위의 새로운 페이지 생성 등의 기능을 지원합니다.
+
 ## Plan
 
 2주차에 시험(기말고사)이 많아서 1주차에 2주차의 개발 대부분까지 하려고 합니다.. ㅠㅠ
@@ -34,10 +42,18 @@
 - [x] 휴지통에서 지워야 localStorage에서 그 페이지 지움
 - [x] Sidebar의 개별 페이지에서 `>` 클릭 시 page hierarchy 보이도록
 - [x] AI assistant UI 생성
-- [ ] `/page`로 만든 페이지 아이템 클릭 시 그 페이지로 이동하는 기능
-- [ ] OPENAI API 연결
-- [ ] OPENAI API로 notion 작업할 수 있도록
-- [ ] 검색 기능 추가
+
+### 3주차 (`week3` branch)
+
+- [x] OPENAI API 연결- 편의상 frontend에서 바로 연결
+- [x] OPENAI API로 notion 작업할 수 있도록
+  - [x] 이어서 쓰기 기능
+  - [x] 번역 기능
+  - [x] 요약 및 인사이트 기능
+  - [x] 새로운 페이지 생성
+- [x] 검색 기능 추가
+- [x] Color system 재정리
+- [x] 각 페이지에 맞게 AI Assistant의 UI도 변경되도록
 
 ## How to run this project
 
@@ -145,3 +161,37 @@ This project will open at `http://localhost:5173`
 - `휴지통` 클릭 시 (`TrashCanOverlay` component)
 
   ![TrashCanOverlay](./assets/TrashCanOverlay.png)
+
+### Week 2
+
+- Header icon 및 제목 편집 가능
+  ![EditableHeader](./assets/EditableHeader.png)
+
+- 개별 페이지의 `...` 클릭 시 (`PageMenuOverlay` component)- `휴지통으로 이동` 기능 구현 완료
+  ![PageMenuOverlay](./assets/PageMenuOverlay.png)
+
+- `휴지통` 클릭 시 기능 추가- 영구 삭제 및 복구 가능
+  ![TrashCanOverlayFunctions](./assets/TrashCanOverlayFunctions.png)
+
+- 개별 페이지의 `+` 클릭 시 하위 페이지 생성 기능
+  ![PageCreateAndHierarchy](./assets/PageCreateAndHierarchy.png)
+
+- 우측 하단의 아이콘 클릭시 나오는 AI Assistant- 현재 page를 감지해서 input section에 현재 페이지 표시 및 현재 페이지를 기준으로 작업을 진행함
+  ![AIAssistant](./assets/AIAssistant.png)
+
+### Week 3
+
+- 작동하는 AI Assistant- 기본적인 질문 가능
+  ![AIFunctionBasic](./assets/AIFunctionBasic.png)
+
+- 작동하는 AI Assistant- 현재 페이지 요약 가능
+  ![AIFunctionSummarize](./assets/AIFunctionSummarize.png)
+
+- 작동하는 AI Assistant- 현재 페이지 번역 가능
+  ![AIFunctionTranslate](./assets/AIFunctionTranslate.png)
+
+- 작동하는 AI Assistant- 현재 페이지에서 새로운 자식 페이지 생성 가능
+  ![AIFunctionMakeNewPage](./assets/AIFunctionMakeNewPage.png)
+
+- `SearchOverlay`에 검색 기능 추가
+  ![SearchOverlayFunctions](./assets/SearchOverlayFunctions.png)
